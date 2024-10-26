@@ -1,0 +1,29 @@
+.user-profile {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    color: white; /* Set the text color to white */
+}
+
+.profile-picture {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin-bottom: 20px;
+}
+
+h4 {
+    margin-bottom: 10px;
+    color: white; /* Ensure h4 text is white */
+}
+
+button {
+    margin-top: 20px;
+    color: black; /* Ensure button text is black for contrast */
+}
+
+.user-profile p {
+    color: white; /* Ensure paragraph text is white */
+}

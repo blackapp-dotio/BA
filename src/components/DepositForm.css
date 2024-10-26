@@ -1,0 +1,49 @@
+.deposit-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 400px;
+    margin: 20px auto;
+}
+
+input {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    color: white;
+    background-color: #333; /* Ensure background contrast */
+}
+
+button {
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-radius: 4px;
+    background-color: #007bff;
+    color: white;
+    cursor: pointer;
+}
+
+button:disabled {
+    background-color: #666;
+    cursor: not-allowed;
+}
+
+.StripeElement {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 4px;
+    border: 1px solid #ddd;
+    color: white;
+    background-color: #333;
+}
+
+.StripeElement--focus {
+    border-color: #007bff;
+}
+
+.error {
+    color: #ff6b6b;
+    margin-top: -15px;
+}

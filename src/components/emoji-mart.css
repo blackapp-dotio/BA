@@ -1,0 +1,37 @@
+/* src/components/emoji-mart.css */
+
+/* Basic styles for emoji-mart picker */
+.emoji-mart {
+  width: 100%;
+  max-width: 350px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
+}
+
+.emoji-mart .emoji-mart-bar {
+  padding: 10px;
+  border-bottom: 1px solid #e8e8e8;
+}
+
+.emoji-mart .emoji-mart-search {
+  width: 100%;
+  padding: 5px;
+  border: 1px solid #e8e8e8;
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.emoji-mart .emoji-mart-emoji {
+  display: inline-block;
+  width: 28px;
+  height: 28px;
+  margin: 5px;
+  cursor: pointer;
+}
+
+.emoji-mart .emoji-mart-category {
+  padding: 10px;
+  border-bottom: 1px solid #e8e8e8;
+}

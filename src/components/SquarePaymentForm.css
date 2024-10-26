@@ -1,0 +1,50 @@
+/* Square Payment Form Styles */
+#payment-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #2c2c2c; /* Dark background */
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    color: #ffffff;
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.sq-input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #444444; /* Darker border */
+    border-radius: 4px;
+    font-size: 16px;
+    color: #ffffff;
+    background-color: #3c3c3c;
+}
+
+.sq-input:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 8px rgba(0, 123, 255, 0.2);
+    outline: none;
+}
+
+button {
+    padding: 12px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #ffffff;
+    background-color: #007bff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+    background-color: #0056b3;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+button:active {
+    background-color: #004080;
+}

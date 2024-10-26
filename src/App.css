@@ -1,38 +1,143 @@
+/* Global Styles */
+body {
+    position: relative; /* Make body the parent for the overlay */
+    background-image: url('./assets/iwaju.png');
+    background-size: cover;
+    background-position: center;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+body::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Black semi-transparent overlay */
+    z-index: 1; /* Ensure the overlay sits above the background */
+}
+
 .App {
-  text-align: center;
+    position: relative;
+    z-index: 2; /* Ensure app content is above the overlay */
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Top Bar Styles */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    background-color: black; /* Solid black background */
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.logo-container {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1;
+    text-align: center;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+.logo {
+    max-width: 100px;
+    cursor: pointer;
 }
 
-.App-link {
-  color: #61dafb;
+.search-container {
+    display: flex;
+    align-items: center;
+    position: relative;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.search-icon,
+.explore-icon {
+    color: white;
+    font-weight: bold;
+}
+
+/* Bottom Navigation Styles */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: space-between;
+    z-index: 1000;
+    padding: 5px 0;
+    box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.bottom-nav .MuiBottomNavigationAction-root {
+    min-width: 0;
+    flex-grow: 1;
+    max-width: none;
+    padding: 10px 0;
+}
+
+.bottom-nav .MuiSvgIcon-root {
+    font-size: 1.5rem;
+    color: white;
+}
+
+.bottom-nav .Mui-selected .MuiSvgIcon-root {
+    color: #ffcc00 !important;
+}
+
+/* Content Styles */
+.content {
+    flex-grow: 1;
+    padding: 20px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent background */
+    color: white;
+    margin-bottom: 56px; /* Ensure content does not overlap with bottom nav */
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .top-bar {
+        padding: 8px;
+    }
+
+    .logo {
+        max-width: 80px;
+    }
+
+    .bottom-nav .MuiSvgIcon-root {
+        font-size: 1.2rem;
+    }
+
+    .content {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .top-bar {
+        padding: 5px;
+    }
+
+    .logo {
+        max-width: 70px;
+    }
+
+    .bottom-nav .MuiSvgIcon-root {
+        font-size: 1rem;
+    }
+
+    .content {
+        padding: 10px;
+    }
 }

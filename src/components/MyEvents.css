@@ -1,0 +1,33 @@
+.my-events {
+    padding: 20px;
+}
+
+.my-events h3 {
+    color: white;
+    margin-bottom: 20px;
+}
+
+.event-card {
+    background-color: #222;
+    color: white;
+    padding: 15px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.event-card h4 {
+    margin-top: 0;
+}
+
+.event-card p {
+    margin: 5px 0;
+}
+
+.event-card a {
+    color: #0af;
+    text-decoration: none;
+}
+
+.event-card a:hover {
+    text-decoration: underline;
+}

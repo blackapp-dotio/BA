@@ -1,0 +1,101 @@
+/* General Container Styling */
+.blog-container {
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+  max-width: 1000px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+/* Header Styling */
+.blog-container h2 {
+  font-size: 36px;
+  color: #00bfff;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+  margin-bottom: 40px;
+}
+
+/* Blog Management Section */
+.blog-management-container {
+  margin: 40px 0;
+}
+
+.blog-management-container h3 {
+  font-size: 28px;
+  color: #f1f1f1;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.blog-management-container input,
+.blog-management-container textarea {
+  width: 80%;
+  max-width: 600px;
+  margin: 10px 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+/* Blog Buttons */
+.blog-management-container button,
+.blogs-list .blog-card .blog-actions button {
+  width: 100%;
+  max-width: 350px;
+  padding: 15px 20px;
+  margin: 10px 0;
+  background-color: rgba(255, 255, 255, 0.1);
+  color: #00bfff;
+  border: 2px solid rgba(0, 191, 255, 0.4);
+  border-radius: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.blog-management-container button:hover,
+.blogs-list .blog-card .blog-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: #00bfff;
+  transform: scale(1.05);
+}
+
+.blog-management-container button:active,
+.blogs-list .blog-card .blog-actions button:active {
+  background-color: rgba(255, 255, 255, 0.2);
+  transform: scale(1.02);
+}
+
+/* Blog Card Styles */
+.blog-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  margin: 20px;
+  transition: transform 0.3s ease;
+}
+
+.blog-card:hover {
+  transform: scale(1.03);
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .blog-container {
+    padding: 20px;
+  }
+
+  .blog-management-container button,
+  .blogs-list .blog-card .blog-actions button {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "537135201263",
+    "firebase_url": "https://wakandaappmobile-default-rtdb.firebaseio.com",
+    "project_id": "wakandaappmobile",
+    "storage_bucket": "wakandaappmobile.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:537135201263:android:4706a756f2ebcfbcf4141a",
+        "android_client_info": {
+          "package_name": "com.blackapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDBAtyzcol0PuJfmIhz5b9cTAWziaM7rKU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

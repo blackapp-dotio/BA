@@ -1,0 +1,55 @@
+.rss-feed-events {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+
+.filter-section {
+    margin-bottom: 20px;
+}
+
+.filter-section input {
+    padding: 8px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 200px;
+}
+
+.event-card {
+    padding: 15px;
+    background-color: #222;
+    color: white;
+    border-radius: 8px;
+    width: 100%;
+    max-width: 400px;
+    margin: auto;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.event-card h3 {
+    margin-top: 0;
+}
+
+.event-card img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin-bottom: 10px;
+}
+
+.event-card p {
+    margin: 10px 0;
+    color: #ddd;
+}
+
+.event-card a {
+    color: #0af;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 10px;
+}
+
+.event-card a:hover {
+    text-decoration: underline;
+}

@@ -1,0 +1,97 @@
+.chat-list {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    padding: 10px;
+    background-color: #333;
+}
+
+.tabs button {
+    flex-grow: 1;
+    padding: 10px;
+    background-color: #555;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+
+.tabs button.active {
+    background-color: #007bff;
+}
+
+.tab-content {
+    flex-grow: 1;
+    background-color: #222;
+    color: #fff;
+    padding: 20px;
+    overflow-y: auto;
+}
+
+.search-bar {
+    padding: 10px;
+    background-color: #333;
+}
+
+.search-input {
+    width: 100%;
+    padding: 10px;
+    border-radius: 5px;
+    border: none;
+    background-color: #444;
+    color: #fff;
+}
+
+.user-list {
+    list-style: none;
+    padding: 0;
+    margin: 10px 0;
+}
+
+.user-list li {
+    padding: 10px;
+    border-bottom: 1px solid #444;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background-color 0.3s ease;
+}
+
+.user-list li:hover {
+    background-color: #555;
+}
+
+/* Styling for unread chats */
+.user-list li.unread {
+    font-weight: bold;
+    color: #ffcc00; /* Distinct color for unread chats */
+}
+
+.display-name {
+    font-size: 1rem;
+}
+
+.last-message {
+    font-size: 0.8rem;
+    color: #888;
+}
+
+/* Indicator for unread messages */
+.user-list li.unread {
+    font-weight: bold;
+    color: #ffcc00; /* Color to highlight unread chats */
+}
+
+.unread-indicator {
+    color: red;
+    font-size: 1.2rem;
+    margin-left: 10px;
+    font-weight: bold;
+}

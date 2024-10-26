@@ -1,0 +1,30 @@
+/* Post.css */
+.post {
+    background-color: rgba(0, 0, 0, 0.7); /* Slightly opaque black background */
+    color: white; /* White text for contrast */
+    margin-bottom: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
+}
+
+.post .MuiCardContent-root {
+    padding: 16px;
+}
+
+.post .MuiTypography-root {
+    color: white; /* Ensuring all text is white for contrast */
+}
+
+.post .MuiCardActions-root {
+    justify-content: flex-start;
+    padding: 8px 16px;
+}
+
+.post .MuiIconButton-root {
+    color: white; /* Ensuring icons are white for contrast */
+    padding: 8px;
+}
+
+.post .MuiIconButton-root .MuiSvgIcon-root {
+    color: white; /* Ensuring icons inside IconButton are white */
+}

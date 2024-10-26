@@ -1,0 +1,46 @@
+/* FundWallet.css */
+.fund-wallet {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 10px;
+  max-width: 400px;
+  margin: auto;
+  color: white;
+}
+
+.fund-wallet h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #ffffff;
+}
+
+.fund-wallet input[type="number"] {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border-radius: 5px;
+  border: none;
+  font-size: 1rem;
+}
+
+.fund-wallet button {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  font-size: 1rem;
+  cursor: pointer;
+}
+
+.fund-wallet button:hover {
+  background-color: #0056b3;
+}
+
+.fund-wallet input[type="number"]:focus,
+.fund-wallet button:focus {
+  outline: none;
+}

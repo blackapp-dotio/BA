@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">BlackApp</string>
+    <string name="title_activity_main">BlackApp</string>
+    <string name="package_name">com.blackapp</string>
+    <string name="custom_url_scheme">com.blackapp</string>
+</resources>

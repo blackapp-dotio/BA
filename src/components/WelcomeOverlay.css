@@ -1,0 +1,80 @@
+.welcome-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.85); /* Semi-transparent black */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.5s ease; /* Fade out transition */
+}
+
+.welcome-overlay.fade-out {
+    opacity: 0;
+    pointer-events: none; /* Disable interaction during fade-out */
+}
+
+.welcome-content {
+    text-align: center;
+}
+
+.welcome-logo {
+    width: 150px; /* Adjust size as needed */
+    margin-bottom: 20px;
+    opacity: 0;
+    transform: translateY(-20px); /* Start the logo slightly above */
+    transition: opacity 1s ease, transform 1s ease; /* Smooth fade-in and slide down */
+}
+
+.welcome-logo.fade-in {
+    opacity: 1;
+    transform: translateY(0); /* Bring the logo into view */
+}
+
+.welcome-message {
+    color: white;
+    font-size: 3rem;
+    font-weight: bold;
+    line-height: 1.2;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 20px;
+}
+
+.cta-buttons {
+    margin-top: 20px;
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+}
+
+.cta-button {
+    background-color: transparent;
+    border: 2px solid rgba(173, 216, 230, 0.6); /* Pale blue semi-transparent border */
+    color: white;
+    padding: 10px 20px;
+    font-size: 1.2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cta-button:hover {
+    background-color: rgba(173, 216, 230, 0.3); /* Pale blue semi-transparent fill on hover */
+}
+
+@media (max-width: 768px) {
+    .welcome-message {
+        font-size: 2rem;
+    }
+
+    .cta-button {
+        font-size: 1rem;
+        padding: 8px 16px;
+    }
+}

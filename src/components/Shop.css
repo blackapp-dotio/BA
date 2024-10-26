@@ -1,0 +1,101 @@
+/* General Container Styling */
+.shop-container {
+  padding: 40px;
+  background-color: rgba(0, 0, 0, 0.85); /* Dark semi-transparent background */
+  color: #ffffff; /* White text for contrast */
+  border-radius: 15px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6); /* Soft shadow for depth */
+  max-width: 1000px;
+  margin: 50px auto;
+  text-align: center;
+}
+
+/* Header Styling */
+.shop-container h2 {
+  font-size: 36px;
+  color: #00bfff; /* Bright color for the header */
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 10px;
+  margin-bottom: 40px;
+}
+
+/* Product Management Section */
+.shop-management-container {
+  margin: 40px 0;
+}
+
+.shop-management-container h3 {
+  font-size: 28px;
+  color: #f1f1f1;
+  margin-bottom: 20px;
+}
+
+/* Input Fields */
+.shop-management-container input,
+.shop-management-container textarea {
+  width: 80%;
+  max-width: 600px;
+  margin: 10px 0;
+  padding: 12px;
+  background-color: rgba(255, 255, 255, 0.1); /* Light input background */
+  color: #ffffff;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+/* Product Buttons */
+.shop-management-container button,
+.products-list .product-card .product-actions button {
+  width: 100%;
+  max-width: 350px;
+  padding: 15px 20px;
+  margin: 10px 0;
+  background-color: rgba(255, 255, 255, 0.1); /* Light button background */
+  color: #00bfff; /* Blue text color for buttons */
+  border: 2px solid rgba(0, 191, 255, 0.4); /* Light border with blue tint */
+  border-radius: 12px;
+  font-size: 18px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+
+.shop-management-container button:hover,
+.products-list .product-card .product-actions button:hover {
+  background-color: rgba(255, 255, 255, 0.15); /* Slightly lighten on hover */
+  border-color: #00bfff; /* Full blue border on hover */
+  transform: scale(1.05); /* Scale up on hover */
+}
+
+.shop-management-container button:active,
+.products-list .product-card .product-actions button:active {
+  background-color: rgba(255, 255, 255, 0.2); /* Slightly more light on active */
+  transform: scale(1.02); /* Scale down slightly on active */
+}
+
+/* Product Card Styles */
+.product-card {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  padding: 20px;
+  margin: 20px;
+  transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+  transform: scale(1.03); /* Slightly scale up on hover */
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .shop-container {
+    padding: 20px;
+  }
+
+  .shop-management-container button,
+  .products-list .product-card .product-actions button {
+    padding: 12px 15px;
+    font-size: 16px;
+  }
+}

@@ -1,0 +1,115 @@
+/* QR Code Container */
+.qr-code-container {
+  padding: 20px;
+  background-color: rgba(0, 0, 0, 0.8);
+  border-radius: 15px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  color: white;
+  margin: 20px auto;
+  max-width: 600px;
+  text-align: center;
+}
+
+.qr-code-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #00bfff; /* Matching accent color */
+}
+
+.qr-code-image {
+  margin: 20px auto;
+  width: 200px;
+  height: 200px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  padding: 10px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+.qr-code-description {
+  font-size: 16px;
+  margin: 10px 0;
+  color: #00bfff;
+}
+
+/* Scanner Section */
+.scanner-container {
+  margin: 20px auto;
+  padding: 20px;
+  border-radius: 15px;
+  background-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.scan-btn {
+  padding: 12px 20px;
+  background-color: rgba(0, 123, 255, 0.8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.scan-btn:hover {
+  background-color: rgba(0, 100, 220, 0.8);
+}
+
+.close-scan-btn {
+  padding: 8px 16px;
+  background-color: rgba(255, 0, 0, 0.8);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  cursor: pointer;
+  margin-top: 15px;
+  transition: background-color 0.3s ease;
+}
+
+.close-scan-btn:hover {
+  background-color: rgba(200, 0, 0, 0.8);
+}
+
+/* QR Scan Result Section */
+.scan-result {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  padding: 15px;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.scan-result h4 {
+  margin-bottom: 10px;
+  color: #00bfff;
+}
+
+.scan-result p {
+  color: white;
+  font-size: 16px;
+}
+
+.scan-result a {
+  display: inline-block;
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: rgba(0, 200, 0, 0.8);
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
+  transition: background-color 0.3s ease;
+}
+
+.scan-result a:hover {
+  background-color: rgba(0, 180, 0, 0.8);
+}
+
+/* Adjustments for mobile screens */
+@media only screen and (max-width: 768px) {
+  .qr-code-container, .scanner-container, .scan-result {
+    width: 90%;
+  }
+}

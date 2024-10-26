@@ -1,0 +1,51 @@
+/* emoji-mart-custom.css */
+
+/* Wrapper for the entire picker */
+.emoji-mart {
+  width: 100% !important;
+  max-width: 350px;
+  background-color: #121212;
+  border-radius: 8px;
+  border: 1px solid #333;
+  color: #fff;
+}
+
+/* Search input field */
+.emoji-mart .emoji-mart-search input {
+  background-color: #1f1f1f;
+  color: #fff;
+  border: 1px solid #444;
+}
+
+/* Emoji categories */
+.emoji-mart .emoji-mart-bar {
+  background-color: #1f1f1f;
+  border-bottom: 1px solid #333;
+}
+
+/* Emoji items */
+.emoji-mart .emoji-mart-category .emoji-mart-emoji {
+  width: 28px;
+  height: 28px;
+}
+
+.emoji-mart .emoji-mart-emoji span {
+  font-size: 22px;
+}
+
+.emoji-mart .emoji-mart-scroll {
+  background-color: #1f1f1f;
+}
+
+/* Category titles */
+.emoji-mart .emoji-mart-category-label {
+  background-color: #121212;
+  color: #fff;
+  border-top: 1px solid #333;
+}
+
+/* Emoji item hover effect */
+.emoji-mart .emoji-mart-emoji:hover {
+  background-color: #333;
+  border-radius: 50%;
+}

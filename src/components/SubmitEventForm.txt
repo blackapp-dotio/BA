@@ -1,0 +1,31 @@
+.submit-event-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background-color: #222;
+    padding: 20px;
+    border-radius: 10px;
+    color: #fff;
+}
+
+.submit-event-form input,
+.submit-event-form textarea {
+    padding: 10px;
+    background-color: #333;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+.submit-event-form button {
+    padding: 10px 20px;
+    background-color: #555;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+.submit-event-form button:hover {
+    background-color: #777;
+}

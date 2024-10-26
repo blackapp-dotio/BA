@@ -1,0 +1,22 @@
+.user-generated-events {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+.event-card {
+    padding: 15px;
+    background-color: #222;
+    color: white;
+    border-radius: 8px;
+    width: 300px;
+}
+
+.event-card a {
+    color: #0af;
+    text-decoration: none;
+}
+
+.event-card a:hover {
+    text-decoration: underline;
+}

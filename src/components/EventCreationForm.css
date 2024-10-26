@@ -1,0 +1,20 @@
+.event-creation-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.event-creation-form input,
+.event-creation-form textarea {
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.event-creation-form button {
+    padding: 10px;
+    background-color: #0af;
+    color: white;
+    border: none;
+    cursor: pointer;
+}

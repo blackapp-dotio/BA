@@ -1,0 +1,16 @@
+/* src/components/Payment.css */
+.payment-form {
+    display: flex;
+    flex-direction: column;
+    width: 300px;
+    margin: 0 auto;
+}
+
+.payment-error {
+    color: red;
+    margin-top: 10px;
+}
+
+button {
+    margin-top: 20px;
+}

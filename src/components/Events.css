@@ -1,0 +1,174 @@
+/* General Page Styling */
+.events-page {
+    display: flex;
+    flex-direction: column;
+    background-color: #121212;
+    color: #e0e0e0;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+/* Tab Navigation Styling */
+.tabs {
+    display: flex;
+    justify-content: space-around;
+    background-color: #1f1f1f;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+.tabs button {
+    flex-grow: 1;
+    padding: 15px;
+    background-color: #333;
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    text-align: center;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.tabs button.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* Tab Content Styling */
+.tab-content {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+/* Filter Bar Styling */
+.filter-bar {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.location-filter {
+    padding: 10px;
+    border-radius: 4px;
+    border: 1px solid #333;
+    background-color: #2c2c2c;
+    color: #fff;
+    font-size: 16px;
+    outline: none;
+    width: 250px;
+}
+
+/* Event Cards Styling */
+.event-card {
+    background-color: #1e1e1e;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.4);
+    color: #fff;
+    transition: transform 0.3s ease;
+    text-align: center;
+}
+
+.event-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0px 8px 20px rgba(0, 0, 0, 0.5);
+}
+
+.event-card-image-wrapper {
+    width: 100%;
+    height: 180px;
+    overflow: hidden;
+    margin-bottom: 15px;
+}
+
+.event-card-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 8px;
+}
+
+.event-card-placeholder {
+    width: 100%;
+    height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #2e2e2e;
+    color: #999999;
+    border-radius: 8px;
+}
+
+/* Form Styling */
+.create-event-form {
+    background-color: #1f1f1f;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.create-event-form h2 {
+    color: #ffffff;
+    margin-bottom: 20px;
+}
+
+.input-field {
+    background-color: #2c2c2c;
+    color: #fff;
+    border: 1px solid #555;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    margin-bottom: 15px;
+}
+
+.submit-button {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 12px;
+    border-radius: 4px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-button:hover {
+    background-color: #0056b3;
+}
+
+/* Modal Styling */
+.modal-content {
+    background-color: #1f1f1f;
+    color: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    margin: 100px auto;
+    text-align: center;
+}
+
+.modal-actions {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 20px;
+}
+
+/* Media Queries for Responsive Design */
+@media (max-width: 768px) {
+    .tabs {
+        flex-direction: column;
+    }
+
+    .tab-content {
+        padding: 15px;
+    }
+
+    .event-card {
+        margin-bottom: 15px;
+    }
+}
