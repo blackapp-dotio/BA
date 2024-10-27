@@ -1,4 +1,4 @@
-name: iOS Build
+name: iOS Build and Appetize.io Upload
 
 on:
   push:
@@ -23,13 +23,12 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build React app without treating warnings as errors
+    - name: Build React app with OpenSSL legacy provider
       run: |
         export NODE_OPTIONS=--openssl-legacy-provider
         CI='' npm run build
 
-
-    - name: Set up Capacitor iOS platform
+    - name: Sync Capacitor iOS platform
       run: npx cap sync ios
 
     - name: Install CocoaPods
@@ -37,24 +36,29 @@ jobs:
         cd ios/App
         pod install
 
-    - name: Build iOS app
+    - name: Build iOS app without code signing
       run: |
         xcodebuild -workspace ios/App/App.xcworkspace \
                    -scheme App \
                    -sdk iphoneos \
                    -configuration Release \
                    -archivePath ${{ github.workspace }}/App.xcarchive \
-                   archive
+                   CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
 
-    - name: Export IPA
+    - name: Export unsigned IPA
       run: |
         xcodebuild -exportArchive \
                    -archivePath ${{ github.workspace }}/App.xcarchive \
                    -exportOptionsPlist ios/App/exportOptions.plist \
-                   -exportPath ${{ github.workspace }}/build
+                   -exportPath ${{ github.workspace }}/build \
+                   CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
-    - name: Upload IPA
-      uses: actions/upload-artifact@v3
-      with:
-        name: WakandaApp-IPA
-        path: build/App.ipa
+    - name: Upload IPA to Appetize.io
+      env:
+        APPETIZE_API_TOKEN: ${{ secrets.APPETIZE_API_TOKEN }}  # Store API token as secret in GitHub
+      run: |
+        curl https://api.appetize.io/v1/apps \
+          -F "file=@build/App.ipa" \
+          -F "platform=ios" \
+          -F "token=${{ env.APPETIZE_API_TOKEN }}"
+
