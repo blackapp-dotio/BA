@@ -51,7 +51,7 @@ jobs:
                    -exportPath ${{ github.workspace }}/build
 
     - name: Upload IPA
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: WakandaApp-IPA
         path: build/App.ipa
