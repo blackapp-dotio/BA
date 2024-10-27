@@ -30,7 +30,7 @@ jobs:
 
 
     - name: Set up Capacitor iOS platform
-      run: npx cap add ios
+      run: npx cap sync ios
 
     - name: Install CocoaPods
       run: |
