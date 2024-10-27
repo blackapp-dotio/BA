@@ -45,13 +45,12 @@ jobs:
                    -archivePath ${{ github.workspace }}/App.xcarchive \
                    CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO archive
 
-    - name: Export unsigned IPA
+    - name: Export iOS archive
       run: |
         xcodebuild -exportArchive \
-                   -archivePath ${{ github.workspace }}/App.xcarchive \
-                   -exportOptionsPlist ${{ github.workspace }}/ios/App/exportOptions.plist \
-                   -exportPath ${{ github.workspace }}/build/ios
-                   CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+                  -archivePath ${{ github.workspace }}/App.xcarchive \
+                  -exportOptionsPlist ${{ github.workspace }}/ios/App/exportOptions.plist \
+                  -exportPath ${{ github.workspace }}/build/ios
 
     - name: Upload IPA to Appetize.io
       env:
