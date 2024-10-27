@@ -23,8 +23,10 @@ jobs:
     - name: Install dependencies
       run: npm install
 
-    - name: Build React app
-      run: npm run build
+    - name: Build React app with OpenSSL legacy provider
+      run: |
+        export NODE_OPTIONS=--openssl-legacy-provider
+        npm run build
 
     - name: Set up Capacitor iOS platform
       run: npx cap add ios
