@@ -1,0 +1,62 @@
+name: iOS Build and Appetize.io Upload
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '18.x'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build React app with OpenSSL legacy provider
+      run: |
+        export NODE_OPTIONS=--openssl-legacy-provider
+        CI='' npm run build
+
+    - name: Sync Capacitor iOS platform
+      run: npx cap sync ios
+
+    - name: Install CocoaPods
+      run: |
+        cd ios/App
+        pod install
+
+    - name: Build iOS app
+      run: |
+        xcodebuild -workspace ios/App/App.xcworkspace \
+                   -scheme App \
+                   -sdk iphoneos \
+                   -configuration Release \
+                   -archivePath ${{ github.workspace }}/App.xcarchive \
+                   archive
+
+    - name: Export IPA
+      run: |
+        xcodebuild -exportArchive \
+                   -archivePath ${{ github.workspace }}/App.xcarchive \
+                   -exportOptionsPlist ios/App/exportOptions.plist \
+                   -exportPath ${{ github.workspace }}/build
+
+    - name: Upload IPA to Appetize.io
+      env:
+        APPETIZE_API_TOKEN: ${{ secrets.tok_76ne4acu4jid5qaldquduqvhju }}  # Store API token as secret in GitHub
+      run: |
+        curl https://api.appetize.io/v1/apps \
+          -F "file=@build/App.ipa" \
+          -F "platform=ios" \
+          -F "token=${{ env.APPETIZE_API_TOKEN }}"
