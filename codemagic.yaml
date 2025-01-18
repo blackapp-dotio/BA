@@ -1,0 +1,31 @@
+workflows:
+  react_native_app:
+    name: React Native Workflow
+    environment:
+      vars:
+        NODE_VERSION: 16
+    scripts:
+      - name: Install Dependencies
+        script: |
+          npm install
+          cd ios
+          pod install
+          cd ..
+      - name: Build Android App
+        script: |
+          cd android
+          ./gradlew assembleRelease
+      - name: Build iOS App
+        script: |
+          xcodebuild -workspace ios/YourProjectName.xcworkspace \
+            -scheme YourProjectName \
+            -sdk iphoneos \
+            -configuration Release \
+            -archivePath $CM_BUILD_DIR/YourProjectName.xcarchive archive
+          xcodebuild -exportArchive \
+            -archivePath $CM_BUILD_DIR/YourProjectName.xcarchive \
+            -exportOptionsPlist ios/exportOptions.plist \
+            -exportPath $CM_BUILD_DIR
+    artifacts:
+      - build/outputs/**/* # For Android
+      - $CM_BUILD_DIR/*.ipa # For iOS
