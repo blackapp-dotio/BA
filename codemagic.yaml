@@ -12,13 +12,13 @@ workflows:
           cd ..
       - name: Build iOS app
         script: |
-          xcodebuild -workspace ios/<YourProjectName>.xcworkspace \
-                     -scheme <YourProjectName> \
+          xcodebuild -workspace ios/BlackApp.xcworkspace \
+                     -scheme BlackApp \
                      -sdk iphoneos \
                      -configuration Release \
-                     -archivePath $CM_BUILD_DIR/<YourProjectName>.xcarchive archive
+                     -archivePath $CM_BUILD_DIR/BlackApp.xcarchive archive
           xcodebuild -exportArchive \
-                     -archivePath $CM_BUILD_DIR/<YourProjectName>.xcarchive \
+                     -archivePath $CM_BUILD_DIR/BlackApp.xcarchive \
                      -exportOptionsPlist ios/exportOptions.plist \
                      -exportPath $CM_BUILD_DIR
     artifacts:
