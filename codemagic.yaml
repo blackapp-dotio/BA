@@ -1,9 +1,7 @@
 workflows:
-  ios_firebase_build:
-    name: iOS Firebase Build
+  ios_build_local:
+    name: iOS Local Build
     environment:
-      vars:
-        FIREBASE_API_TOKEN: $FIREBASE_API_TOKEN # Add Firebase API token in the environment variables
       xcode: latest
     scripts:
       - name: Install dependencies
@@ -25,7 +23,3 @@ workflows:
                      -exportPath $CM_BUILD_DIR
     artifacts:
       - $CM_BUILD_DIR/*.ipa
-    publishing:
-      firebase:
-        api_token: $FIREBASE_API_TOKEN
-        groups: BlackAppCrew # Firebase tester group
