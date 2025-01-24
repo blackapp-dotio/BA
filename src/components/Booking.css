@@ -1,5 +1,5 @@
 /* General Container Styling */
-.consult-container {
+.booking-container {
   padding: 40px;
   background-color: rgba(0, 0, 0, 0.85); /* Dark semi-transparent background */
   color: #ffffff; /* White text for contrast */
@@ -11,7 +11,7 @@
 }
 
 /* Header Styling */
-.consult-container h2 {
+.booking-container h2 {
   font-size: 36px;
   color: #00bfff; /* Bright color for the header */
   border-bottom: 2px solid rgba(255, 255, 255, 0.2);
@@ -19,20 +19,20 @@
   margin-bottom: 40px;
 }
 
-/* Consultation Management Section */
-.consult-management-container {
+/* Booking Management Section */
+.booking-management-container {
   margin: 40px 0;
 }
 
-.consult-management-container h3 {
+.booking-management-container h3 {
   font-size: 28px;
   color: #f1f1f1;
   margin-bottom: 20px;
 }
 
 /* Input Fields */
-.consult-management-container input,
-.consult-management-container textarea {
+.booking-management-container input,
+.booking-management-container textarea {
   width: 80%;
   max-width: 600px;
   margin: 10px 0;
@@ -44,9 +44,9 @@
   font-size: 16px;
 }
 
-/* Consultation Buttons */
-.consult-management-container button,
-.consults-list .consult-card .consult-actions button {
+/* Booking Buttons */
+.booking-management-container button,
+.bookings-list .booking-card .booking-actions button {
   width: 100%;
   max-width: 350px;
   padding: 15px 20px;
@@ -60,21 +60,21 @@
   transition: background-color 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
 }
 
-.consult-management-container button:hover,
-.consults-list .consult-card .consult-actions button:hover {
+.booking-management-container button:hover,
+.bookings-list .booking-card .booking-actions button:hover {
   background-color: rgba(255, 255, 255, 0.15); /* Slightly lighten on hover */
   border-color: #00bfff; /* Full blue border on hover */
   transform: scale(1.05); /* Scale up on hover */
 }
 
-.consult-management-container button:active,
-.consults-list .consult-card .consult-actions button:active {
+.booking-management-container button:active,
+.bookings-list .booking-card .booking-actions button:active {
   background-color: rgba(255, 255, 255, 0.2); /* Slightly more light on active */
   transform: scale(1.02); /* Scale down slightly on active */
 }
 
-/* Consultation Card Styles */
-.consult-card {
+/* Booking Card Styles */
+.booking-card {
   background-color: rgba(255, 255, 255, 0.05);
   border-radius: 15px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
@@ -83,18 +83,18 @@
   transition: transform 0.3s ease;
 }
 
-.consult-card:hover {
+.booking-card:hover {
   transform: scale(1.03); /* Slightly scale up on hover */
 }
 
 /* Responsive Adjustments */
 @media (max-width: 768px) {
-  .consult-container {
+  .booking-container {
     padding: 20px;
   }
 
-  .consult-management-container button,
-  .consults-list .consult-card .consult-actions button {
+  .booking-management-container button,
+  .bookings-list .booking-card .booking-actions button {
     padding: 12px 15px;
     font-size: 16px;
   }

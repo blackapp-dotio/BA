@@ -1,4 +1,4 @@
-/* General Container */
+/* Container and General Layout */
 .dashboard-container {
   padding: 40px;
   background-color: rgba(0, 0, 0, 0.8);
@@ -9,13 +9,54 @@
   margin: 0 auto;
 }
 
+.tabs {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.tab-button {
+  padding: 10px 20px;
+  color: #ffffff;
+  background: transparent;
+  border: 1px solid #555555;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.tab-button.active {
+  background: rgba(0, 123, 255, 0.5);
+}
+
+/* Tab Content Styling */
+.tab-content {
+  margin-top: 20px;
+}
+
+.agbank-tab {
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+/* Transfer Section Inputs and Button */
+.transfer-section input,
+.transfer-button {
+  padding: 10px;
+  margin-top: 10px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.3);
+  color: #ffffff;
+  border: none;
+}
+
 /* Header Style */
 h2 {
   text-align: center;
   color: #00bfff;
 }
 
-/* Dashboard Section Style */
+/* Dashboard Section */
 .dashboard-section {
   margin-bottom: 40px;
 }
@@ -41,6 +82,11 @@ h2 {
 
 .dashboard-table td {
   background-color: rgba(255, 255, 255, 0.1);
+}
+
+.dashboard-table tfoot tr td {
+  background-color: rgba(255, 255, 255, 0.1);
+  font-weight: bold;
 }
 
 /* Button Styling */
@@ -98,7 +144,8 @@ button {
 }
 
 /* Financial Stats and Transfer Section */
-.financial-stats {
+.financial-stats,
+.transfer-funds {
   margin: 20px 0;
   padding: 15px;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -106,19 +153,11 @@ button {
   background-color: rgba(0, 0, 0, 0.6);
 }
 
-.financial-stats p {
+.financial-stats p,
+.transfer-funds p {
   margin: 8px 0;
   font-size: 16px;
   color: #ffffff;
-}
-
-/* Transfer Funds Section */
-.transfer-funds {
-  margin: 20px 0;
-  padding: 20px;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 15px;
-  background-color: rgba(0, 0, 0, 0.6);
 }
 
 .transfer-funds h4 {
@@ -126,7 +165,8 @@ button {
   margin-bottom: 15px;
 }
 
-.transfer-funds input {
+.transfer-funds input,
+.transfer-funds .transfer-btn {
   margin-right: 10px;
   padding: 10px;
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -163,10 +203,4 @@ button {
   padding: 10px 0;
   font-size: 18px;
   color: white;
-}
-
-/* Transaction Table Footer Styling */
-.dashboard-table tfoot tr td {
-  background-color: rgba(255, 255, 255, 0.1);
-  font-weight: bold;
 }

@@ -3,12 +3,21 @@
 <plist version="1.0">
 <dict>
   <key>method</key>
-  <string>development</string>
-  <key>stripSwiftSymbols</key>
-  <true/>
-  <key>compileBitcode</key>
-  <false/>
+  <string>ad-hoc</string>
+  <key>signingStyle</key>
+  <string>manual</string>
+  <key>provisioningProfiles</key>
+  <dict>
+    <key>com.blackapp</key> <!-- Replace this with your app's bundle identifier -->
+    <string></string> <!-- Leave this empty for unsigned builds -->
+  </dict>
+  <key>teamID</key>
+  <string></string> <!-- Leave this blank for unsigned builds -->
   <key>destination</key>
   <string>export</string>
+  <key>compileBitcode</key>
+  <false/>
+  <key>thinning</key>
+  <string>&lt;none&gt;</string>
 </dict>
 </plist>

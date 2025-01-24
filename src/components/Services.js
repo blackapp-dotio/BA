@@ -67,19 +67,23 @@ const Services = () => {
   };
 
   // Handle adding a new service
-  const handleAddService = async () => {
-    if (!newService.name || !newService.description || !newService.price) {
-      alert('Please fill in all the fields.');
-      return;
-    }
+const handleAddService = async () => {
+  if (!newService.name || !newService.price) {
+    alert('Please fill in all required fields.');
+    return;
+  }
 
-    const serviceId = push(ref(database, `brands/${brandId}/services`)).key;
-    const service = { id: serviceId, ...newService, price: parseFloat(newService.price) };
-
-    await update(ref(database, `brands/${brandId}/services/${serviceId}`), service);
-    setServices([...services, service]);
-    setNewService({ name: '', description: '', price: '' });
+  const serviceId = push(ref(database, `brands/${brandId}/tools/Services/services`)).key;
+  const service = {
+    id: serviceId,
+    ...newService,
+    price: parseFloat(newService.price),
   };
+
+  await update(ref(database, `brands/${brandId}/tools/Services/services/${serviceId}`), service);
+  setServices([...services, service]);
+  setNewService({ name: '', description: '', price: '' });
+};
 
   // Handle editing a service
   const handleEditService = (service) => {

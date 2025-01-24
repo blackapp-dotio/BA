@@ -7,6 +7,16 @@ import './Payment.css';
 
 const stripePromise = loadStripe('pk_live_51PgcwEDMo9PoF6U3Yo5oyegDHpqq2voaFZbXwIVdDTYk9ojEobiUxJeACxHJjXonHBSUSWjP3OqqjHB7cMVhVc3p00DKIMZGAF');
 
+const handleMomoPayment = async () => {
+    // Mock API call or implement Momo integration logic
+    alert("Momo payment initiated!");
+};
+
+const handleCashAppPayment = () => {
+    alert("CashApp payment initiated!");
+};
+
+
 const CheckoutForm = () => {
     const stripe = useStripe();
     const elements = useElements();
@@ -47,6 +57,10 @@ const CheckoutForm = () => {
     };
 
     return (
+    
+    	  <button type="button" onClick={handleMomoPayment}>Pay with Momo</button>
+	  <button type="button" onClick={handleCashAppPayment}>Pay with CashApp</button>
+    
         <form onSubmit={handleSubmit} className="payment-form">
             <CardElement />
             <button type="submit" disabled={!stripe || loading}>

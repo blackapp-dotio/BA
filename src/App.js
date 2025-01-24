@@ -1,5 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { BrowserRouter as Router, Route, Routes, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Feed from './components/Feed';
@@ -34,12 +35,18 @@ import BrandDetails from './components/BrandDetails';
 import AGBankDashboard from './components/AGBankDashboard'; 
 import AdminPanel from './components/AdminPanel';
 import BrandManagement from './components/BrandManagement';
-import Shop from './components/Shop';
+import ShopTool from './components/ShopTool';
 import Services from './components/Services';
-import Consult from './components/Consult';
+import Booking from './components/Booking';
 import Blog from './components/Blog';
 import Courses from './components/Courses';
 import BrandTemplate from './components/BrandTemplate';
+import TestCircleAnalytics from './components/TestCircleAnalytics';
+import TestARCircle from './components/TestARCircle';
+import './components/styles/buttons.css';
+import agGlobalLogo from './assets/ag-global-logo.png';
+import Support from './components/Support';
+import SupportIcon from '@mui/icons-material/HelpOutline'; 
 
 const theme = createTheme({
     palette: {
@@ -93,11 +100,30 @@ const gifs = [
 ];
 
 function App() {
+    const { businessName } = useParams();
     const [value, setValue] = useState(0);
     const [searchOpen, setSearchOpen] = useState(false);
     const navigate = useNavigate();
     const { user } = useContext(AuthContext);
     const location = useLocation();
+    const [isAdmin, setIsAdmin] = useState(false);
+    const [currentRoute, setCurrentRoute] = useState('/'); // Default route
+
+ // Triggered when clicking on a brand logo to navigate to brand management
+   // const navigateToBrandManagement = (brandId) => {
+     // navigate(`/brand-management/${brandId}`);
+      
+  // };   
+  
+      // Mock user roles for testing; replace with actual role fetching logic
+    const userRole = user?.role || 'user'; // Roles: 'user', 'admin', 'superAdmin'
+
+    const handleAGLogoClick = () => {
+        if (userRole === 'admin' || userRole === 'superAdmin') {
+            navigate('/agbank-dashboard');
+        }
+    };
+  
 
     const handleLogoClick = () => {
         if (location.pathname === '/feed') {
@@ -154,12 +180,31 @@ function App() {
                             style={{ cursor: 'pointer' }}
                         />
                     </div>
+                    
+  <div className="toolbar-actions">
+    <IconButton 
+        className="explore-icon" 
+        onClick={() => navigate('/explore')} 
+        style={{ opacity: 1 }}
+    >
+        <ExploreIcon />
+    </IconButton>
+</div>
+                  
 
-                    <div className="toolbar-actions">
-                        <IconButton className="explore-icon" onClick={() => navigate('/explore')} style={{ opacity: 1 }}>
-                            <ExploreIcon />
-                        </IconButton>
-                    </div>
+    <div className="toolbar-actions">
+    <IconButton
+        className="support-icon"
+        onClick={() => navigate('/support')}
+        style={{
+            opacity: 1,
+            color: '#00FFFF', // Cyan glow color
+            animation: 'glow 1.5s infinite',
+        }}
+    >
+        <SupportIcon />
+    </IconButton>
+</div>
                 </div>
 
                 <GifBorder gifs={gifs} />
@@ -173,9 +218,10 @@ function App() {
                         <Route path="/register" element={<Register />} />
                         <Route path="/password-reset" element={<PasswordReset />} />
                         <Route path="/explore" element={<Explore />} />
+                        <Route path="/support" element={<Support />} />
                         <Route path="/admin" element={<AdminPanel />} />
                         <Route path="/wallet/sendMoney/:recipientId" component={Wallet} />
-
+                       
                         {/* Protected Routes */}
                         <Route path="/profile" element={<PrivateRoute><Profile /></PrivateRoute>} />
                         <Route path="/profile/:uid" element={<PrivateRoute><Profile /></PrivateRoute>} />
@@ -184,17 +230,20 @@ function App() {
                         <Route path="/group-chat" element={<PrivateRoute><GroupChat /></PrivateRoute>} />
                         <Route path="/send-money" element={<PrivateRoute><SendAGMoney /></PrivateRoute>} />
                         <Route path="/wallet" element={<PrivateRoute><Wallet /></PrivateRoute>} />
+                        <Route path="/profile/:uid/brands" element={<BrandManagement />} />
                         <Route path="/admin-dashboard" element={<PrivateRoute adminOnly={true}><AGBankDashboard /></PrivateRoute>} />
                         <Route path="/agbank-dashboard" element={<AGBankDashboard />} />
                         <Route path="/brand-management/:brandId" element={<BrandManagement />} />
-                        <Route path="/brand-management/:brandId/shop" element={<Shop />} /> {/* Shop Management */}
+                        <Route path="/brand-management/:brandId/shopTool" element={<ShopTool />} /> {/* Shop Management */}                         
                         <Route path="/brand-management/:brandId/services" element={<Services />} /> {/* Service Management */}
-                        <Route path="/brand-management/:brandId/consult" element={<Consult />} />
+                        <Route path="/brand-management/:brandId/booking" element={<booking />} />
                         <Route path="/brand-management/:brandId/blog" element={<Blog />} />
                         <Route path="/brand-management/:brandId/courses" element={<Courses />} />
+                        
 
                         {/* Brand Template */}
-                        <Route path="/brand/:brandId" element={<BrandTemplate />} />
+                        <Route path="/brand/:businessName" element={<BrandTemplate />} />
+                        <Route path="/brand/:businessName/product/:productId" element={<BrandTemplate />} />
 
                         {/* Catch-All Route for Invalid URLs */}
                         <Route path="*" element={<Navigate to="/feed" />} />
@@ -202,13 +251,27 @@ function App() {
                 </div>
                 {user && (
                     <BottomNavigation value={value} onChange={handleTabChange} className="bottom-nav">
-                        <BottomNavigationAction label="Feed" icon={<HomeIcon />} />
+                        <BottomNavigationAction label="Gossip" icon={<HomeIcon />} />
                         <BottomNavigationAction label="Events" icon={<EventIcon />} />
                         <BottomNavigationAction label="Profile" icon={<AccountCircleIcon />} />
                         <BottomNavigationAction label="Chat" icon={<ChatIcon />} />
                         <BottomNavigationAction label="Wallet" icon={<FolderIcon />} />
                     </BottomNavigation>
                 )}
+                {/* AG Global Logo Footer */}
+                <div className="footer">
+<div 
+    className="ag-global-logo-container"
+    onClick={() => navigate('/wallet')}
+    style={{ cursor: 'pointer' }}
+>
+    <img
+        src={agGlobalLogo}
+        alt="AG Global"
+        className="ag-global-logo"
+    />
+</div>
+                </div>
             </div>
         </ThemeProvider>
     );

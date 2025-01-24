@@ -19,7 +19,7 @@ body::before {
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5); /* Black semi-transparent overlay */
+/* background-color: rgba(0, 0, 0, 0.5); /* Black semi-transparent overlay */
     z-index: 1; /* Ensure the overlay sits above the background */
 }
 
@@ -139,5 +139,119 @@ body::before {
 
     .content {
         padding: 10px;
+    }
+}
+
+/* General Button Styles */
+button {
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: white !important; /* Bold white text */
+    background-color: rgba(0, 0, 0, 0.4) !important; /* Dark semi-transparent background */
+    border: 2px solid transparent !important; /* Default border */
+    border-radius: 8px !important;
+    padding: 12px 20px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-block !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important; /* Subtle floating effect */
+}
+
+/* Bright Silver Border Buttons (Primary) */
+button {
+    border-color: rgba(192, 192, 192, 0.8) !important; /* Bright silver border */
+}
+
+button:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker background */
+    box-shadow: 0 6px 20px rgba(192, 192, 192, 0.5) !important; /* Bright silver glow */
+}
+
+button:active {
+    background-color: rgba(0, 0, 0, 0.8) !important; /* Even darker background */
+    box-shadow: 0 4px 10px rgba(192, 192, 192, 0.4) !important; /* Pressed bright silver effect */
+}
+
+/* Transparent Blue Border Buttons (Secondary) */
+button.secondary {
+    background-color: rgba(0, 0, 0, 0.4) !important; /* Same semi-transparent background */
+    border-color: rgba(0, 0, 255, 0.5) !important; /* Blue border */
+}
+
+button.secondary:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker background */
+    box-shadow: 0 6px 20px rgba(0, 0, 255, 0.5) !important; /* Blue glow */
+}
+
+button.secondary:active {
+    background-color: rgba(0, 0, 0, 0.8) !important; /* Even darker background */
+    box-shadow: 0 4px 10px rgba(0, 0, 255, 0.4) !important; /* Pressed blue effect */
+}
+
+/* Disabled Buttons */
+button:disabled {
+    background-color: rgba(128, 128, 128, 0.3) !important; /* Semi-transparent gray */
+    color: rgba(255, 255, 255, 0.6) !important; /* Lightened text */
+    border-color: rgba(128, 128, 128, 0.5) !important; /* Muted border */
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}
+
+/* Styles for the AG Global logo */
+.ag-global-logo-container {
+    position: fixed; /* Keep the logo fixed at the bottom */
+    bottom: 10px; /* Adjust the distance from the bottom */
+    right: 10px; /* Adjust the distance from the right */
+    z-index: 1000; /* Ensure the logo stays on top */
+    background: rgba(0, 0, 0, 0.5); /* Semi-transparent black background */
+    border: 1px solid rgba(255, 255, 255, 0.3); /* Futuristic border */
+    border-radius: 50%; /* Make it circular */
+    padding: 10px; /* Space inside the button */
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3), 0 0 30px rgba(0, 255, 255, 0.1); /* Glow effect */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer; /* Show pointer on hover */
+    transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+}
+
+/* Logo image style */
+.ag-global-logo {
+    width: 50px; /* Ideal button-sized dimensions */
+    height: 50px; /* Keep it proportional */
+    object-fit: contain; /* Ensure the image scales properly */
+    filter: drop-shadow(0px 0px 3px rgba(0, 255, 255, 0.7)); /* Subtle glowing shadow */
+}
+
+/* Hover effect */
+.ag-global-logo-container:hover {
+    transform: scale(1.1); /* Slight enlargement on hover */
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.5), 0 0 50px rgba(0, 255, 255, 0.3); /* Increase glow */
+}
+
+.support-button {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    background-color: #00f;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    box-shadow: 0 0 10px 2px rgba(0, 0, 255, 0.8);
+    animation: glow 1.5s infinite alternate;
+    z-index: 9999;
+    cursor: pointer;
+}
+
+@keyframes glow {
+    from {
+        box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
+    }
+    to {
+        box-shadow: 0 0 15px rgba(0, 0, 255, 1);
     }
 }

@@ -1,31 +1,31 @@
 workflows:
-  react_native_app:
-    name: React Native Workflow
+  ios_firebase_build:
+    name: iOS Firebase Build
     environment:
       vars:
-        NODE_VERSION: 16
+        FIREBASE_API_TOKEN: $FIREBASE_API_TOKEN # Add Firebase API token in the environment variables
+      xcode: latest
     scripts:
-      - name: Install Dependencies
+      - name: Install dependencies
         script: |
           npm install
           cd ios
           pod install
           cd ..
-      - name: Build Android App
+      - name: Build iOS app
         script: |
-          cd android
-          ./gradlew assembleRelease
-      - name: Build iOS App
-        script: |
-          xcodebuild -workspace ios/BlackApp.xcworkspace \
-            -scheme BlackApp \
-            -sdk iphoneos \
-            -configuration Release \
-            -archivePath $CM_BUILD_DIR/BlackApp.xcarchive archive
+          xcodebuild -workspace ios/<YourProjectName>.xcworkspace \
+                     -scheme <YourProjectName> \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -archivePath $CM_BUILD_DIR/<YourProjectName>.xcarchive archive
           xcodebuild -exportArchive \
-            -archivePath $CM_BUILD_DIR/BlackApp.xcarchive \
-            -exportOptionsPlist ios/exportOptions.plist \
-            -exportPath $CM_BUILD_DIR
+                     -archivePath $CM_BUILD_DIR/<YourProjectName>.xcarchive \
+                     -exportOptionsPlist ios/exportOptions.plist \
+                     -exportPath $CM_BUILD_DIR
     artifacts:
-      - build/outputs/**/* # For Android
-      - $CM_BUILD_DIR/*.ipa # For iOS
+      - $CM_BUILD_DIR/*.ipa
+    publishing:
+      firebase:
+        api_token: $FIREBASE_API_TOKEN
+        groups: BlackAppCrew # Firebase tester group

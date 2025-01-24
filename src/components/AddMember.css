@@ -1,0 +1,75 @@
+.add-member {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0, 0, 0, 0.8); /* Dark semi-transparent background */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  color: white; /* White text for readability */
+  max-width: 400px; /* Limit the width for better UX */
+  width: 90%; /* Make it responsive */
+}
+
+.add-member input {
+  display: block;
+  margin-bottom: 15px;
+  padding: 10px;
+  width: 100%;
+  border: none;
+  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.1); /* Subtle transparency */
+  color: white; /* White text for input fields */
+}
+
+.add-member input::placeholder {
+  color: rgba(255, 255, 255, 0.6); /* Subtle white for placeholders */
+}
+
+.add-member .results {
+  max-height: 200px;
+  overflow-y: auto;
+  margin-top: 10px;
+}
+
+.add-member .user {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.add-member .user span {
+  font-size: 16px;
+}
+
+.add-member button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 5px;
+  background-color: #1e90ff; /* Bright blue button for contrast */
+  color: white;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.add-member button:hover {
+  background-color: #4682b4; /* Slightly darker blue on hover */
+}
+
+.add-member .close-button {
+  background-color: transparent;
+  color: white;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
+
+.add-member .close-button:hover {
+  color: #ff6347; /* Red on hover for close button */
+}

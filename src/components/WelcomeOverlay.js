@@ -23,7 +23,8 @@ const WelcomeOverlay = () => {
         <div className={`welcome-overlay ${fadeOut ? 'fade-out' : ''}`}>
             <div className="welcome-content">
                 <div className="welcome-message">
-                    <h1>Welcome To The Black Experience</h1>
+                    <h1> BlackApp </h1>
+ 		<h2> The social Business Hub </h2>
                 </div>
                 <img 
                     src={'./logo192.png'}  // Replace with the actual path to your logo

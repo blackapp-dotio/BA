@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { ref, set } from 'firebase/database';
-import { auth, database } from '../firebase';  // Ensure Firebase is imported
+import { auth, database } from '../firebase'; // Ensure Firebase is imported
 import './Register.css';
 
 const Register = () => {
@@ -10,7 +10,8 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const [username, setUsername] = useState('');
     const [location, setLocation] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState(''); // Optional
+    const [birthday, setBirthday] = useState(''); // Optional
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const navigate = useNavigate();
@@ -25,15 +26,19 @@ const Register = () => {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
 
-            // Store additional user information in Firebase Database
-            const userRef = ref(database, `users/${user.uid}`);
-            await set(userRef, {
+            // Prepare additional user information
+            const userData = {
                 uid: user.uid,
                 email: user.email,
                 username,
                 location,
-                phoneNumber,
-            });
+                ...(phoneNumber && { phoneNumber }), // Include only if provided
+                ...(birthday && { birthday }) // Include only if provided
+            };
+
+            // Store user information in Firebase Database
+            const userRef = ref(database, `users/${user.uid}`);
+            await set(userRef, userData);
 
             console.log('User registered successfully:', user.uid);
 
@@ -81,10 +86,15 @@ const Register = () => {
                 />
                 <input
                     type="tel"
-                    placeholder="Phone Number"
+                    placeholder="Phone Number (Optional)"
                     value={phoneNumber}
                     onChange={(e) => setPhoneNumber(e.target.value)}
-                    required
+                />
+                <input
+                    type="date"
+                    placeholder="Birthday (Optional)"
+                    value={birthday}
+                    onChange={(e) => setBirthday(e.target.value)}
                 />
                 <button type="submit" disabled={loading}>
                     {loading ? 'Registering...' : 'Register'}

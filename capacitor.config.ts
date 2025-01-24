@@ -4,6 +4,7 @@ const config: CapacitorConfig = {
   appId: 'com.blackapp',
   appName: 'BlackApp',
   webDir: 'build'
+  "bundledWebRuntime": false
 };
 
 export default config;

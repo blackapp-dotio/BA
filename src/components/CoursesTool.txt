@@ -1,0 +1,60 @@
+import React, { useState, useEffect } from 'react';
+import { ref, push, update, remove, onValue } from 'firebase/database';
+import { database } from '../firebaseconfig';
+import './ToolStyles.css';
+
+const CoursesTool = ({ brandId }) => {
+  const [courses, setCourses] = useState([]);
+  const [newCourse, setNewCourse] = useState({ title: '', description: '' });
+
+  useEffect(() => {
+    const coursesRef = ref(database, `brands/${brandId}/tools/courses/courses`);
+    onValue(coursesRef, (snapshot) => {
+      const data = snapshot.val();
+      setCourses(data ? Object.values(data) : []);
+    });
+  }, [brandId]);
+
+  const addCourse = async () => {
+    const courseId = push(ref(database, `brands/${brandId}/tools/courses/courses`)).key;
+    await update(ref(database, `brands/${brandId}/tools/courses/courses/${courseId}`), { ...newCourse, id: courseId });
+    setNewCourse({ title: '', description: '' });
+  };
+
+  const deleteCourse = async (courseId) => {
+    await remove(ref(database, `brands/${brandId}/tools/courses/courses/${courseId}`));
+  };
+
+  return (
+    <div className="tool-container">
+      <h3>Courses</h3>
+      <input
+        type="text"
+        placeholder="Course Title"
+        value={newCourse.title}
+        onChange={(e) => setNewCourse({ ...newCourse, title: e.target.value })}
+        className="tool-input"
+      />
+      <textarea
+        placeholder="Course Description"
+        value={newCourse.description}
+        onChange={(e) => setNewCourse({ ...newCourse, description: e.target.value })}
+        className="tool-textarea"
+      />
+      <button onClick={addCourse} className="tool-button">Add Course</button>
+
+      <h4>Existing Courses</h4>
+      <ul className="tool-list">
+        {courses.map((course) => (
+          <li key={course.id} className="tool-list-item">
+            <p>{course.title}</p>
+            <p>{course.description}</p>
+            <button onClick={() => deleteCourse(course.id)} className="tool-delete-button">Delete</button>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+};
+
+export default CoursesTool;

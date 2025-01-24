@@ -1,0 +1,68 @@
+.tool-container {
+  background: rgba(0, 0, 0, 0.8);
+  color: #e0e0e0;
+  padding: 20px;
+  border-radius: 8px;
+  max-width: 600px;
+  margin: 20px auto;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.5);
+}
+
+.tool-container h3 {
+  color: #ffffff;
+  text-shadow: 0px 2px 4px rgba(0, 0, 0, 0.6);
+}
+
+.tool-input,
+.tool-textarea {
+  width: 100%;
+  background: rgba(50, 50, 50, 0.8);
+  border: 1px solid #444;
+  color: #ffffff;
+  padding: 8px;
+  border-radius: 4px;
+  margin-bottom: 10px;
+}
+
+.tool-button {
+  background: linear-gradient(145deg, #1a73e8, #0d47a1);
+  color: #ffffff;
+  border: none;
+  padding: 10px 15px;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 5px;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease;
+}
+
+.tool-button:hover {
+  transform: translateY(-2px);
+}
+
+.tool-list {
+  list-style: none;
+  padding: 0;
+}
+
+.tool-list-item {
+  background: rgba(40, 40, 40, 0.7);
+  margin: 8px 0;
+  padding: 10px;
+  border-radius: 8px;
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.tool-delete-button {
+  background: #e74c3c;
+  color: #ffffff;
+  border: none;
+  padding: 5px 10px;
+  font-weight: bold;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.tool-delete-button:hover {
+  background: #c0392b;
+}

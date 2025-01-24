@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext, memo } from 'react';
 import { FaPaypal, FaDollarSign, FaQrcode } from 'react-icons/fa';
 import { SiCashapp } from 'react-icons/si';
 import { MdMobileScreenShare } from 'react-icons/md'; // Icon for MOMO
-import { ref, onValue, set, push, update } from 'firebase/database';
+import { ref, onValue, set, push, update, get } from 'firebase/database';
 import { database } from '../firebase';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
@@ -29,31 +29,42 @@ const Wallet = () => {
   const [platformFeeBalance, setPlatformFeeBalance] = useState(0);
 
   // Fetch user wallet and transaction data when the user is available
-  useEffect(() => {
-    if (user) {
-      const balanceRef = ref(database, `users/${user.uid}/wallet/balance`);
-      onValue(balanceRef, (snapshot) => setBalance(snapshot.val() || 0));
+useEffect(() => {
+  if (user) {
+    const balanceRef = ref(database, `users/${user.uid}/wallet/balance`);
+    onValue(balanceRef, (snapshot) => setBalance(snapshot.val() || 0));
 
-      const transactionsRef = ref(database, 'transactions');
-      onValue(transactionsRef, (snapshot) => {
-        const transactionsData = snapshot.val();
-        const filteredTransactions = Object.keys(transactionsData || {})
-          .map((key) => transactionsData[key])
-          .filter((transaction) => transaction.senderId === user.uid || transaction.recipientId === user.uid);
+    const transactionsRef = ref(database, 'transactions');
+    onValue(transactionsRef, (snapshot) => {
+      const transactionsData = snapshot.val();
+      if (transactionsData) {
+        const filteredTransactions = Object.values(transactionsData)
+          .filter(
+            (transaction) =>
+              transaction.senderId === user.uid ||
+              transaction.recipientId === user.uid ||
+              transaction.buyerId === user.uid // Capture purchase transactions specifically
+          )
+          .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)); // Sort transactions by timestamp
+
         setTransactions(filteredTransactions);
+      } else {
+        setTransactions([]);
+      }
+    });
+    
+   
+    const usersRef = ref(database, 'users');
+    onValue(usersRef, (snapshot) => {
+      const usersData = snapshot.val();
+      const names = {};
+      Object.keys(usersData || {}).forEach((uid) => {
+        names[uid] = usersData[uid].displayName;
       });
-
-      const usersRef = ref(database, 'users');
-      onValue(usersRef, (snapshot) => {
-        const usersData = snapshot.val();
-        const names = {};
-        Object.keys(usersData || {}).forEach((uid) => {
-          names[uid] = usersData[uid].displayName;
-        });
-        setUserNames(names);
-      });
-    }
-  }, [user?.uid]);
+      setUserNames(names);
+    });
+  }
+}, [user?.uid]);
 
   // Handle QR code scanning and redirect to the wallet page
   const handleScan = (recipientId) => {
@@ -224,6 +235,131 @@ const Wallet = () => {
       timestamp: Date.now(),
     });
   };
+  
+  const handleConfirmDelivery = async (transactionId) => {
+  try {
+    const transactionRef = ref(database, `transactions/${transactionId}`);
+    const snapshot = await get(transactionRef);
+
+    if (snapshot.exists()) {
+      const transaction = snapshot.val();
+
+      // Check if the transaction is in a "pending" state
+      if (transaction.status === "pending") {
+        // Add funds to the seller's wallet
+        const sellerWalletRef = ref(database, `users/${transaction.recipientId}/wallet/balance`);
+        const sellerSnapshot = await get(sellerWalletRef);
+        const sellerBalance = sellerSnapshot.val() || 0;
+
+        await set(sellerWalletRef, sellerBalance + transaction.amount);
+
+        // Deduct platform fee and add it to AGBank
+        const agBankRef = ref(database, "AGBank/totalFees");
+        const agBankSnapshot = await get(agBankRef);
+        const agBankBalance = agBankSnapshot.val() || 0;
+
+        await set(agBankRef, agBankBalance + transaction.platformFee);
+
+        // Mark transaction as "completed"
+        await update(transactionRef, { status: "completed" });
+
+        setPaymentStatus("Transaction successfully confirmed and completed!");
+      } else {
+        setPaymentStatus("Transaction is not in a pending state.");
+      }
+    } else {
+      setPaymentStatus("Transaction not found.");
+    }
+  } catch (error) {
+    console.error("Error confirming delivery:", error);
+    setPaymentStatus("An error occurred while confirming the delivery.");
+  }
+};
+
+const handleRaiseDispute = async (transactionId) => {
+  try {
+    const transactionRef = ref(database, `transactions/${transactionId}`);
+    const snapshot = await get(transactionRef);
+
+    if (snapshot.exists()) {
+      const transaction = snapshot.val();
+
+      if (transaction.status === "pending") {
+        // Mark transaction as "disputed"
+        await update(transactionRef, { status: "disputed" });
+
+        setPaymentStatus("Dispute raised. Our team will review the transaction.");
+      } else {
+        setPaymentStatus("Only pending transactions can be disputed.");
+      }
+    } else {
+      setPaymentStatus("Transaction not found.");
+    }
+  } catch (error) {
+    console.error("Error raising dispute:", error);
+    setPaymentStatus("An error occurred while raising the dispute.");
+  }
+};
+
+const handleConfirmReceipt = async (transactionId) => {
+  try {
+    // Fetch the transaction details
+    const transactionRef = ref(database, `transactions/${transactionId}`);
+    const transactionSnapshot = await get(transactionRef);
+
+    if (!transactionSnapshot.exists()) {
+      alert("Transaction not found.");
+      return;
+    }
+
+    const transaction = transactionSnapshot.val();
+
+    // Check if the transaction is already completed
+    if (transaction.status === "completed") {
+      alert("Transaction is already completed.");
+      return;
+    }
+
+    // Acknowledgment prompt
+    const acknowledgment = window.confirm(
+      `By confirming receipt of the item/service, you are agreeing that:\n\n` +
+      `1. You have received the item or service as described.\n` +
+      `2. You are authorizing the release of $${transaction.amount.toFixed(2)} AGMoney to the seller.\n` +
+      `3. This action is final, and you will not be able to raise a dispute after confirmation.\n\n` +
+      `Do you agree to proceed?`
+    );
+
+    if (!acknowledgment) {
+      alert("Transaction confirmation canceled.");
+      return;
+    }
+
+    // Update the seller's wallet balance
+    const sellerWalletRef = ref(
+      database,
+      `users/${transaction.sellerId}/wallet/balance`
+    );
+    const sellerBalanceSnapshot = await get(sellerWalletRef);
+    const sellerBalance = sellerBalanceSnapshot.val() || 0;
+
+    const updatedBalance = sellerBalance + transaction.amount;
+
+    // Update transaction status to "completed"
+    const updates = {
+      [`transactions/${transactionId}/status`]: "completed",
+      [`users/${transaction.sellerId}/wallet/balance`]: updatedBalance,
+    };
+
+    await update(ref(database), updates);
+
+    alert("Receipt confirmed! Funds have been released to the seller.");
+  } catch (error) {
+    console.error("Error confirming receipt:", error);
+    alert("An error occurred while confirming the receipt.");
+  }
+};
+
+
 
   const handlePayPalDeposit = () => {
     if (!paypalEmail || !depositAmount || depositAmount <= 0) {
@@ -307,6 +443,15 @@ const Wallet = () => {
     setPaymentStatus(null);
   };
 
+const formatAmount = (amount) => {
+  if (typeof amount !== "number" || isNaN(amount)) {
+    return "0"; // Fallback for invalid values
+  }
+  return Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(amount);
+};
+
+
+
   // Render the form for the selected payment method
   const renderPaymentForm = () => {
     switch (selectedMethod) {
@@ -383,6 +528,10 @@ const Wallet = () => {
         return null;
     }
   };
+  
+const validTransactions = transactions.filter(
+  (transaction) => typeof transaction.amount === "number" && !isNaN(transaction.amount)
+);  
 
   return (
     <div className="wallet-container">
@@ -418,33 +567,89 @@ const Wallet = () => {
       {/* QR Code Component */}
       <QRCodeComponent user={user} handleScan={handleScan} />
 
-      {/* Transaction History Section */}
-      <div className="transactions">
-        <h3>Transaction History</h3>
-        {transactions.length === 0 ? (
-          <p>No transactions yet.</p>
-        ) : (
-          <table>
-            <thead>
-              <tr>
-                <th>Description</th>
-                <th>Amount</th>
-                <th>Date</th>
-              </tr>
-            </thead>
-            <tbody>
-              {transactions.map((transaction, index) => (
-                <tr key={index}>
-                  <td>{transaction.senderId === user.uid ? 'You sent' : 'Received'}</td>
-                  <td>${transaction.amount.toFixed(2)}</td>
-                  <td>{new Date(transaction.timestamp).toLocaleString()}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        )}
-      </div>
-    </div>
+
+<div className="pending-transactions">
+  <h3>Pending Transactions</h3>
+  {transactions
+    .filter(
+      (transaction) =>
+        transaction &&
+        transaction.buyerId === user?.uid &&
+        transaction.status === "pending"
+    )
+    .map((transaction) => {
+      // Safely extract and fallback to default values
+      const itemName = transaction.itemName || "Unknown Item";
+      const amount = transaction.amount ?? 0; // Default to 0 if amount is missing
+
+      return (
+        <div key={transaction.transactionId || Math.random()} className="transaction-card">
+          <p>
+            <strong>Item:</strong> {itemName}
+          </p>
+          <p>
+            <strong>Amount:</strong> ${amount.toFixed(2)}
+          </p>
+          <button
+            className="confirm-button"
+            onClick={() => handleConfirmDelivery(transaction.transactionId)}
+          >
+            Confirm Delivery
+          </button>
+          <button
+            className="dispute-button"
+            onClick={() => handleRaiseDispute(transaction.transactionId)}
+          >
+            Raise Dispute
+          </button>
+        </div>
+      );
+    })}
+</div>
+
+
+
+<div className="transactions">
+  <h3>Transaction History</h3>
+  {transactions.length === 0 ? (
+    <p>No transactions yet.</p>
+  ) : (
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th>Amount</th>
+          <th>Date</th>
+          <th>Status</th>
+          {/** Optional action column for pending transactions */}
+          <th>Action</th>
+        </tr>
+      </thead>
+
+<tbody>
+  {validTransactions.map((transaction, index) => (
+    <tr key={transaction.id || index}>
+      <td>
+        {transaction.senderId === user?.uid
+          ? "You sent"
+          : transaction.recipientId === user?.uid
+          ? "You received"
+          : "Purchase"}
+      </td>
+      <td>${formatAmount(transaction.amount)}</td>
+      <td>
+        {transaction.timestamp
+          ? new Date(transaction.timestamp).toLocaleString()
+          : "N/A"}
+      </td>
+      <td>{transaction.status || "Unknown"}</td>
+    </tr>
+  ))}
+</tbody>
+    </table>
+  )}  
+</div>
+</div>
   );
 };
 

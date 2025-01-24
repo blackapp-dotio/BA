@@ -53,12 +53,12 @@ const CreatePost = ({ open, handleClose, displayName, loading, setLoading }) => 
             setLoading(false);  // Reset loading state
         }
     };
-
+ 
     return (
         <Modal open={open} onClose={handleClose}>
             <Box sx={{ position: 'absolute', top: '50%', left: '50%', transform: 'translate(-50%, -50%)', width: 400, bgcolor: 'background.paper', boxShadow: 24, p: 4 }}>
                 <TextField
-                    label="What's on your mind?"
+                    label="What's the gist?"
                     variant="outlined"
                     fullWidth
                     margin="normal"

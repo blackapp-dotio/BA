@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, useCallback } from 'react';
 import axios from 'axios';
 import { ref, onValue, update, remove, push, get } from 'firebase/database';
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -11,6 +11,10 @@ import { AuthContext } from '../contexts/AuthContext';
 import './Feed.css';
 import './Post.css';
 import crypto from 'crypto';
+import {
+    Avatar,
+} from '@mui/material';
+
 
 const Feed = () => {
     const [feedContent, setFeedContent] = useState([]);
@@ -28,11 +32,20 @@ const Feed = () => {
     const auth = getAuth();
 
     const proxyUrl = 'https://us-central1-wakandan-app.cloudfunctions.net/api/proxy?url=';
+    
+    const getProxiedImageUrl = (imageUrl) => {
+    if (!imageUrl) return '';
+    return `${proxyUrl}${encodeURIComponent(imageUrl)}`;
+};
+
     const [loadingMore, setLoadingMore] = useState(false);
     const [startIndex, setStartIndex] = useState(0);
-    const itemsPerPage = 5; // Limit for lazy loading
+    const itemsPerPage = 5;
 
     const RSS_FEED_URLS = [
+        'https://rss.app/feeds/hXAXAKLk6J0sbRX0.xml',
+        'https://rss.app/feeds/a0BC3EgcQ2gi6jt9.xml',
+        'https://rss.app/feeds/MDlghVUX5yvecvRG.xml',
         'https://www.pulse.ng/entertainment/rss',
         'https://www.theafricanmirror.africa/arts-and-entertainment/feed/',
         'https://www.africanexponent.com/rss/entertainment',
@@ -41,7 +54,11 @@ const Feed = () => {
         'https://www.allabouttrh.com/feed/',
         'https://bckonline.com/feed/',
         'https://balleralert.com/feed/',
+        'https://rss.app/feeds/nsmT2WdQXSlshmcy.xml',
+        'https://rss.app/feeds/XqrrnyuiP2E5gvZY.xml',
+        'https://rss.app/feeds/Vgjdsm6FBHT3mj4G.xml',
         'https://www.buzzfeed.com/celebrity.xml',
+        'https://rss.app/feeds/3zTVOBAND5ezpD5g.xml',
         'https://sahiphopmag.co.za/feed/',
         'https://naijavibes.com/feed/',
         'https://tooxclusive.com/feed/',
@@ -51,7 +68,9 @@ const Feed = () => {
         'https://afro.com/section/arts-entertainment/feed/',
         'https://globalgrind.com/category/entertainment/feed/',
         'https://www.thesouthafrican.com/culture/entertainment/',
-        // More feed URLs...
+        'https://rss.app/feeds/keM7mXLp4OlutaGg.xml',
+        'https://rss.app/feeds/KwsTlmbvwXiY4YX6.xml',
+        'https://rss.app/feeds/fQ6cY8V57Sk5ayox.xml',
     ];
 
     // Throttle scroll event handler
@@ -69,27 +88,27 @@ const Feed = () => {
 
     // Generate a unique ID for each item
     const generateUniqueId = (item) => {
-        const link = item.link || '';  // Ensure it's a string
-        const title = item.title || '';  // Ensure it's a string
-        const dataToHash = link + title;  // Concatenate link and title
-        
+        const link = item.link || '';
+        const title = item.title || '';
+        const dataToHash = link + title;
+
         if (typeof dataToHash !== 'string' || dataToHash.trim() === '') {
             console.error("Invalid data for generating unique ID:", item);
-            return '';  // Return an empty string for invalid data
+            return '';
         }
 
-        return crypto.createHash('md5').update(dataToHash).digest('hex');  // Hash the concatenated string
+        return crypto.createHash('md5').update(dataToHash).digest('hex');
     };
 
     // Handle scroll event for lazy loading
     const handleScroll = () => {
         if (window.innerHeight + document.documentElement.scrollTop >= document.documentElement.offsetHeight - 50) {
-            loadMoreRSSFeeds(); // Load more items when the user scrolls near the bottom
+            loadMoreRSSFeeds();
         }
     };
 
     useEffect(() => {
-        const handleScrollThrottled = throttle(handleScroll, 500);  // Throttle the scroll event handler
+        const handleScrollThrottled = throttle(handleScroll, 500);
         window.addEventListener('scroll', handleScrollThrottled);
 
         return () => {
@@ -97,19 +116,17 @@ const Feed = () => {
         };
     }, [startIndex]);
 
-    const CACHE_EXPIRATION_TIME = 10 * 60 * 1000; // 10 minutes in milliseconds
+    const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // Reduced caching for fresher content
 
-    const fetchRSSFeeds = async () => {
+    const fetchRSSFeeds = useCallback(async () => {
         const cachedFeeds = JSON.parse(localStorage.getItem('cachedFeeds'));
         const cacheTimestamp = localStorage.getItem('cacheTimestamp');
         const now = new Date().getTime();
         let allRssItems = [];
 
-        // Check if the cache exists and is still valid
         if (cachedFeeds && cacheTimestamp && (now - cacheTimestamp < CACHE_EXPIRATION_TIME)) {
             allRssItems = cachedFeeds;
         } else {
-            // Fetch fresh data if no cache or cache is expired
             for (const url of RSS_FEED_URLS) {
                 try {
                     const response = await axios.get(`${proxyUrl}${encodeURIComponent(url)}`);
@@ -119,13 +136,12 @@ const Feed = () => {
                     console.error(`Failed to fetch RSS feed from ${url}:`, error.message);
                 }
             }
-            // Update the cache with the new data and timestamp
             localStorage.setItem('cachedFeeds', JSON.stringify(allRssItems));
             localStorage.setItem('cacheTimestamp', now);
         }
 
         return deduplicateFeeds(allRssItems).filter(item => item.image);
-    };
+    }, []);
 
     const deduplicateFeeds = (items) => {
         const uniqueItemsMap = new Map();
@@ -150,15 +166,20 @@ const Feed = () => {
         setLoadingMore(false);
     };
 
+    
     useEffect(() => {
         const fetchContent = async () => {
+        
+        const cachedFeed = JSON.parse(localStorage.getItem('feedContent'));
+        if (cachedFeed) {
+            setFeedContent(cachedFeed); // Show cached content immediately
+        }
+        
             try {
-                const rssContent = await fetchRSSFeeds();  // Fetch RSS feed items first
-                const userPosts = await fetchUserPosts();  // Fetch user posts
-
-                const combinedContent = interweavePosts(userPosts, rssContent);  // Alternate posts and RSS feeds
-
-                setFeedContent(combinedContent);  // Set the interwoven content to the state
+                const rssContent = await fetchRSSFeeds();
+                const userPosts = await fetchUserPosts();
+                const combinedContent = interweavePosts(userPosts, rssContent);
+                setFeedContent(combinedContent);
 
                 const likesRef = ref(database, 'likes');
                 onValue(likesRef, (snapshot) => {
@@ -180,10 +201,9 @@ const Feed = () => {
 
         fetchContent();
 
-        const interval = setInterval(fetchContent, 60000); // Refresh every 1 minute
-
+        const interval = setInterval(fetchContent, 60000);
         return () => clearInterval(interval);
-    }, [user]);
+    }, [user, fetchRSSFeeds]);
 
     const parseRSSFeed = (rssData) => {
         const parser = new DOMParser();
@@ -208,6 +228,20 @@ const Feed = () => {
 
         return rssItems;
     };
+    
+    const updateCacheWithFreshData = async () => {
+    try {
+        const rssContent = await fetchRSSFeeds();
+        const userPosts = await fetchUserPosts();
+        const combinedContent = interweavePosts(userPosts, rssContent);
+
+        setFeedContent(combinedContent);
+        localStorage.setItem('feedContent', JSON.stringify(combinedContent));
+    } catch (error) {
+        console.error('Error updating cache with fresh data:', error);
+    }
+};
+
 
     const fetchUserPosts = () => {
         return new Promise((resolve) => {
@@ -225,7 +259,7 @@ const Feed = () => {
                             type: 'user',
                         };
                     }));
-                    resolve(postsWithUserInfo.reverse()); // Ensure posts are in reverse order by timestamp
+                    resolve(postsWithUserInfo.reverse());
                 } else {
                     resolve([]);
                 }
@@ -238,7 +272,6 @@ const Feed = () => {
         let userIndex = 0;
         let rssIndex = 0;
 
-        // Interweave the user posts and RSS feed content
         while (userIndex < userPosts.length || rssIndex < rssContent.length) {
             if (userIndex < userPosts.length) {
                 combinedContent.push(userPosts[userIndex]);
@@ -253,16 +286,58 @@ const Feed = () => {
         return combinedContent;
     };
 
-    const handleLike = (index) => {
-        if (user) {
-            const newLikes = {
-                ...likes,
-                [index]: (likes[index] || 0) + 1,
-            };
-            setLikes(newLikes);
-            update(ref(database, `likes/${index}`), newLikes[index]);
+ const handleLike = async (postId) => {
+  if (user) {
+    const postLikeRef = ref(database, `likes/${postId}`);
+    const userLikeRef = ref(database, `likes/${postId}/users/${user.uid}`);
+    
+    // Check if user already liked the post
+    const userSnapshot = await get(userLikeRef);
+    if (userSnapshot.exists()) {
+      alert("You've already liked this post!");
+      return;
+    }
+
+    // Get current likes count
+    const snapshot = await get(postLikeRef);
+    const currentLikes = snapshot.exists() && typeof snapshot.val().count === 'number'
+      ? snapshot.val().count
+      : 0;
+
+    const newLikes = currentLikes + 1;
+
+    // Update the like count and add the user ID
+    await update(postLikeRef, {
+      count: newLikes,
+      [`users/${user.uid}`]: true,
+    });
+
+    // Update local state
+    setLikes((prevLikes) => ({
+      ...prevLikes,
+      [postId]: {
+        ...prevLikes[postId],
+        count: newLikes,
+      },
+    }));
+  } else {
+    navigate('/login');
+  }
+};
+
+    const handleShare = (index) => {
+        const shareData = {
+            title: 'Check out this post!',
+            text: 'Have a look at this post on BlackApp.',
+            url: `${window.location.origin}/post/${index}`,
+        };
+
+        if (navigator.share) {
+            navigator.share(shareData).catch(console.error);
         } else {
-            navigate('/login');
+            navigator.clipboard.writeText(shareData.url).then(() => {
+                alert('Post link copied to clipboard!');
+            }).catch(console.error);
         }
     };
 
@@ -330,48 +405,52 @@ const Feed = () => {
         }
     };
 
-    const handleAddPost = async () => {
-        if ((newPost.trim() || mediaFile) && user) {
-            const postId = push(ref(database, 'feed')).key;
+const handleAddPost = async () => {
+    if ((newPost.trim() || mediaFile) && user) {
+        const postId = push(ref(database, 'feed')).key;
 
-            let mediaUrl = '';
-            if (mediaFile) {
-                const storage = getStorage();
-                const mediaStorageRef = storageRef(storage, `posts/${postId}/${mediaFile.name}`);
-                await uploadBytes(mediaStorageRef, mediaFile);
-                mediaUrl = await getDownloadURL(mediaStorageRef);
-            }
-
-            const userRef = ref(database, `users/${user.uid}`);
-            const snapshot = await get(userRef);
-            let displayName = 'Anonymous';
-
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                displayName = userData.displayName || 'Anonymous';
-            }
-
-            const post = {
-                id: postId,
-                userId: user.uid,
-                displayName: displayName,
-                text: newPost,
-                mediaUrl,
-                timestamp: new Date().getTime(),
-            };
-
-            const updates = {};
-            updates[`/feed/${postId}`] = post;
-
-            await update(ref(database), updates);
-
-            setNewPost('');
-            setMediaFile(null);
-            handleClosePostModal();
-        } else {
-            navigate('/login');
+        let mediaUrl = '';
+        if (mediaFile) {
+            const storage = getStorage();
+            const mediaStorageRef = storageRef(storage, `posts/${postId}/${mediaFile.name}`);
+            await uploadBytes(mediaStorageRef, mediaFile);
+            mediaUrl = await getDownloadURL(mediaStorageRef);
         }
-    };
+
+        const userRef = ref(database, `users/${user.uid}`);
+        const snapshot = await get(userRef);
+
+        let displayName = 'Anonymous';
+        let profilePicture = ''; // Default to an empty string if no picture is available
+
+        if (snapshot.exists()) {
+            const userData = snapshot.val();
+            displayName = userData.displayName || 'Anonymous';
+            profilePicture = userData.profilePicture || ''; // Fetch the profile picture URL
+        }
+
+        const post = {
+            id: postId,
+            userId: user.uid,
+            displayName: displayName,
+            profilePicture: profilePicture, // Include the profile picture in the post
+            text: newPost,
+            mediaUrl,
+            timestamp: new Date().getTime(),
+        };
+
+        const updates = {};
+        updates[`/feed/${postId}`] = post;
+
+        await update(ref(database), updates);
+
+        setNewPost('');
+        setMediaFile(null);
+        handleClosePostModal();
+    } else {
+        navigate('/login');
+    }
+};
 
     const handleClosePostModal = () => {
         setPosting(false);
@@ -394,50 +473,92 @@ const Feed = () => {
         );
     };
 
-    const renderFeedItem = (item) => {
-        return (
-            <Card key={item.id} className="feed-item" id={`content-${item.id}`}>
-                <Typography variant="h6" component="span" onClick={() => navigate(`/user/${item.userId}`)} className="profile-name">
-                    {item.type === 'rss' ? item.title : item.displayName}
-                </Typography>
-                {item.image && <CardMedia component="img" alt={item.title || item.displayName} image={item.image} />}
-                <CardContent>
-                    {item.type !== 'rss' && (
-                        <Typography variant="body2" color="text.secondary">
-                            {item.text}
-                        </Typography>
-                    )}
-                </CardContent>
-                {expanded[item.id] && (
-                    <CardContent>
-                        {expandedComments[item.id] && renderComments(item.id)}
-                    </CardContent>
-                )}
-                <CardActions>
-                    <IconButton onClick={() => handleLike(item.id)} aria-label="like">
-                        <ThumbUp /> {likes[item.id] || 0}
-                    </IconButton>
-                    <IconButton onClick={() => handleOpenCommentModal(item.id)} aria-label="comment">
-                        <Comment /> {comments[item.id] ? Object.keys(comments[item.id]).length : 0}
-                    </IconButton>
-                    <IconButton aria-label="share">
-                        <Share />
-                    </IconButton>
-                    {item.type === 'rss' && (
-                        <IconButton onClick={() => handleExpandClick(item.id)} aria-label="expand">
-                            <ExpandMore />
-                        </IconButton>
-                    )}
-                    {item.userId === user?.uid && (
-                        <IconButton onClick={() => handleDeletePost(item.id)} aria-label="delete">
-                            <Delete />
-                        </IconButton>
-                    )}
-                </CardActions>
-            </Card>
-        );
-    };
+const renderFeedItem = (item) => {
+    const isBrandOrProduct = item.type === 'shop' || item.type === 'blog' || item.type === 'booking' || item.type === 'services';
 
+    return (
+        <Card key={item.id} className="feed-item" id={`content-${item.id}`}>
+            {/* User/Brand Name or RSS Feed Title */}
+            <Typography
+                variant="h6"
+                component="span"
+                onClick={() => navigate(`/user/${item.userId}`)}
+                className="profile-name"
+            >
+                {item.type === 'rss' ? item.title : item.displayName}
+            </Typography>
+            
+            {/* Image handling for both RSS Feeds and Brands/Products */}
+            {item.imageUrl ? (
+                <a href={item.link || '#'} target="_blank" rel="noopener noreferrer">
+                    <CardMedia
+                        component="img"
+                        alt={item.title || item.displayName}
+                        image={getProxiedImageUrl(item.image || item.imageUrl)}
+                        className="feed-item-image"
+                    />
+                </a>
+            ) : (
+                item.image && (
+                    <CardMedia
+                        component="img"
+                        alt={item.title || item.displayName}
+                        image={item.image}
+                        className="feed-item-image"
+                    />
+                )
+            )}
+
+            {/* Description/Text Content */}
+            <CardContent>
+                {item.type !== 'rss' && (
+                    <Typography variant="body2" color="text.secondary">
+                        {item.text}
+                    </Typography>
+                )}
+                {/* Add clickable link for RSS Feeds or brand links */}
+                {item.link && (
+                    <Typography variant="body2" color="primary">
+                        <a href={item.link} target="_blank" rel="noopener noreferrer">
+                            View more
+                        </a>
+                    </Typography>
+                )}
+            </CardContent>
+
+            {/* Expandable Comments Section */}
+            {expanded[item.id] && (
+                <CardContent>
+                    {expandedComments[item.id] && renderComments(item.id)}
+                </CardContent>
+            )}
+
+            {/* Action Buttons */}
+            <CardActions>
+                <IconButton onClick={() => handleLike(item.id)} aria-label="Like">
+                    <ThumbUp />
+                    {likes[item.id]?.count || 0}
+                </IconButton>
+                <IconButton onClick={() => handleOpenCommentModal(item.id)} aria-label="comment">
+                    <Comment /> {comments[item.id] ? Object.keys(comments[item.id]).length : 0}
+                </IconButton>
+                <IconButton onClick={() => handleShare(item.id)} aria-label="share">
+                    <Share />
+                </IconButton>
+                {item.type === 'rss' && (
+                    <IconButton onClick={() => handleExpandClick(item.id)} aria-label="expand">
+                        <ExpandMore />
+                    </IconButton>
+                )}
+                {item.userId === user?.uid && (
+                    <IconButton onClick={() => handleDeletePost(item.id)} aria-label="delete">
+                        <Delete />
+                    </IconButton>
+                )}
+            </CardActions>
+        </Card>
+    );
+};
     return (
         <div className="feed">
             {user && (
@@ -446,7 +567,7 @@ const Feed = () => {
                         <Typography variant="h6">Create a Post</Typography>
                         <div className="form-body">
                             <TextField
-                                label="What's on your mind?"
+                                label="What's the gist?"
                                 variant="outlined"
                                 fullWidth
                                 margin="normal"
@@ -466,6 +587,16 @@ const Feed = () => {
                     </CardContent>
                 </Card>
             )}
+            
+                <div className="feed">
+        {feedContent.length > 0 ? (
+            feedContent.map((item) => renderFeedItem(item))
+        ) : (
+            <Typography variant="h6">Loading feed...</Typography> // Placeholder for no cached content
+        )}
+        {loadingMore && <Typography variant="h6">Loading more content...</Typography>}
+    </div>
+            
             {feedContent.map((item) => renderFeedItem(item))}
             {loadingMore && <Typography variant="h6">Loading more content...</Typography>}
             <Modal
@@ -492,6 +623,7 @@ const Feed = () => {
                 </Box>
             </Modal>
         </div>
+      
     );
 };
 

@@ -1,0 +1,55 @@
+/* General Button Styles */
+button {
+    font-family: inherit !important;
+    font-size: 16px !important;
+    font-weight: bold !important;
+    color: white !important; /* Bold white text */
+    background-color: rgba(0, 0, 0, 0.4) !important; /* Dark semi-transparent background */
+    border: 2px solid transparent !important; /* Default border */
+    border-radius: 8px !important;
+    padding: 12px 20px !important;
+    cursor: pointer !important;
+    transition: all 0.3s ease !important;
+    display: inline-block !important;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important; /* Subtle floating effect */
+}
+
+/* Jet Grey Border Buttons (Primary) */
+button {
+    border-color: rgba(50, 50, 50, 0.8) !important; /* Jet grey border */
+}
+
+button:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker background */
+    box-shadow: 0 6px 20px rgba(50, 50, 50, 0.5) !important; /* Jet grey glow */
+}
+
+button:active {
+    background-color: rgba(0, 0, 0, 0.8) !important; /* Even darker background */
+    box-shadow: 0 4px 10px rgba(50, 50, 50, 0.4) !important; /* Pressed jet grey effect */
+}
+
+/* Transparent Blue Border Buttons (Secondary) */
+button.secondary {
+    background-color: rgba(0, 0, 0, 0.4) !important; /* Same semi-transparent background */
+    border-color: rgba(0, 0, 255, 0.5) !important; /* Blue border */
+}
+
+button.secondary:hover {
+    background-color: rgba(0, 0, 0, 0.6) !important; /* Slightly darker background */
+    box-shadow: 0 6px 20px rgba(0, 0, 255, 0.5) !important; /* Blue glow */
+}
+
+button.secondary:active {
+    background-color: rgba(0, 0, 0, 0.8) !important; /* Even darker background */
+    box-shadow: 0 4px 10px rgba(0, 0, 255, 0.4) !important; /* Pressed blue effect */
+}
+
+/* Disabled Buttons */
+button:disabled {
+    background-color: rgba(128, 128, 128, 0.3) !important; /* Semi-transparent gray */
+    color: rgba(255, 255, 255, 0.6) !important; /* Lightened text */
+    border-color: rgba(128, 128, 128, 0.5) !important; /* Muted border */
+    cursor: not-allowed !important;
+    box-shadow: none !important;
+}

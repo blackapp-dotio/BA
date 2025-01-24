@@ -1,0 +1,15 @@
+/* variables.css */
+:root {
+  --primary-color: rgba(128, 0, 128, 0.4); /* Light purple */
+  --primary-border-color: rgba(128, 0, 128, 0.8); /* Dark purple border */
+  --secondary-color: rgba(0, 0, 255, 0.4); /* Light blue */
+  --secondary-border-color: rgba(0, 0, 255, 0.8); /* Dark blue border */
+  --success-color: rgba(0, 255, 0, 0.4); /* Light green */
+  --danger-color: rgba(255, 0, 0, 0.4); /* Light red */
+  --neutral-color: rgba(0, 0, 0, 0.3); /* Semi-transparent black */
+  --disabled-color: rgba(128, 128, 128, 0.3); /* Gray for disabled buttons */
+
+  --font-size-base: 16px;
+  --border-radius: 8px;
+  --shadow: 0 4px 15px rgba(0, 0, 0, 0.3); /* Default shadow */
+}

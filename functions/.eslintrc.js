@@ -1,28 +1,22 @@
 module.exports = {
-  env: {
-    es6: true,
-    node: true,
-  },
-  parserOptions: {
-    "ecmaVersion": 2018,
-  },
-  extends: [
-    "eslint:recommended",
-    "google",
-  ],
-  rules: {
-    "no-restricted-globals": ["error", "name", "length"],
-    "prefer-arrow-callback": "error",
-    "quotes": ["error", "double", {"allowTemplateLiterals": true}],
-  },
-  overrides: [
-    {
-      files: ["**/*.spec.*"],
-      env: {
-        mocha: true,
-      },
-      rules: {},
+    env: {
+        es6: true, // Replace es2021 with es6
+        node: true,
     },
-  ],
-  globals: {},
+    extends: [
+        'eslint:recommended',
+    ],
+    parserOptions: {
+        ecmaVersion: 2018, // Compatible with es6
+    },
+    rules: {
+        // Add your custom rules here
+    },
+
+    settings: {
+        react: {
+            version: "detect", // Automatically detect the React version
+        },
+    },
+    extends: ["plugin:react/recommended"],
 };
