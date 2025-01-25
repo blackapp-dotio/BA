@@ -118,30 +118,27 @@ const Feed = () => {
 
     const CACHE_EXPIRATION_TIME = 5 * 60 * 1000; // Reduced caching for fresher content
 
-    const fetchRSSFeeds = useCallback(async () => {
-        const cachedFeeds = JSON.parse(localStorage.getItem('cachedFeeds'));
-        const cacheTimestamp = localStorage.getItem('cacheTimestamp');
-        const now = new Date().getTime();
-        let allRssItems = [];
+const fetchRSSFeeds = useCallback(async () => {
+    let allRssItems = [];
 
-        if (cachedFeeds && cacheTimestamp && (now - cacheTimestamp < CACHE_EXPIRATION_TIME)) {
-            allRssItems = cachedFeeds;
-        } else {
-            for (const url of RSS_FEED_URLS) {
-                try {
-                    const response = await axios.get(`${proxyUrl}${encodeURIComponent(url)}`);
-                    const rssItems = parseRSSFeed(response.data);
-                    allRssItems.push(...rssItems.slice(0, 3));
-                } catch (error) {
-                    console.error(`Failed to fetch RSS feed from ${url}:`, error.message);
-                }
-            }
-            localStorage.setItem('cachedFeeds', JSON.stringify(allRssItems));
-            localStorage.setItem('cacheTimestamp', now);
+    for (const url of RSS_FEED_URLS) {
+        try {
+            const response = await axios.get(`${proxyUrl}${encodeURIComponent(url)}`);
+            const rssItems = parseRSSFeed(response.data);
+
+            // Include feed URL as metadata for debugging or sorting purposes
+            const itemsWithSource = rssItems.map(item => ({ ...item, sourceUrl: url }));
+            allRssItems.push(...itemsWithSource);
+        } catch (error) {
+            console.error(`Failed to fetch RSS feed from ${url}:`, error.message);
         }
+    }
 
-        return deduplicateFeeds(allRssItems).filter(item => item.image);
-    }, []);
+    // Sort items by their publication date (newest first)
+    allRssItems.sort((a, b) => new Date(b.pubDate) - new Date(a.pubDate));
+
+    return deduplicateFeeds(allRssItems).filter(item => item.image); // Return unique items with images
+}, []);
 
     const deduplicateFeeds = (items) => {
         const uniqueItemsMap = new Map();
@@ -154,17 +151,28 @@ const Feed = () => {
         return Array.from(uniqueItemsMap.values());
     };
 
-    const loadMoreRSSFeeds = async () => {
-        if (loadingMore) return;
+const loadMoreRSSFeeds = async (initial = false) => {
+    if (loadingMore) return;
 
-        setLoadingMore(true);
-        const rssContent = await fetchRSSFeeds();
+    setLoadingMore(true);
+    const rssContent = await fetchRSSFeeds();
 
-        const newItems = rssContent.slice(startIndex, startIndex + itemsPerPage);
-        setFeedContent((prevContent) => deduplicateFeeds([...prevContent, ...newItems]));
-        setStartIndex(startIndex + itemsPerPage);
-        setLoadingMore(false);
-    };
+    const newItems = rssContent.slice(
+        initial ? 0 : startIndex,
+        startIndex + itemsPerPage
+    );
+
+    setFeedContent(prevContent =>
+        deduplicateFeeds([...prevContent, ...newItems])
+    );
+    setStartIndex(initial ? itemsPerPage : startIndex + itemsPerPage);
+    setLoadingMore(false);
+};
+
+// Call with initial load flag
+useEffect(() => {
+    loadMoreRSSFeeds(true); // Load the first batch immediately
+}, []);
 
     
     useEffect(() => {
@@ -205,29 +213,31 @@ const Feed = () => {
         return () => clearInterval(interval);
     }, [user, fetchRSSFeeds]);
 
-    const parseRSSFeed = (rssData) => {
-        const parser = new DOMParser();
-        const xmlDoc = parser.parseFromString(rssData, 'application/xml');
-        const items = xmlDoc.getElementsByTagName('item');
-        const rssItems = [];
+const parseRSSFeed = (rssData) => {
+    const parser = new DOMParser();
+    const xmlDoc = parser.parseFromString(rssData, 'application/xml');
+    const items = xmlDoc.getElementsByTagName('item');
+    const rssItems = [];
 
-        for (let i = 0; i < items.length; i++) {
-            const item = items[i];
-            const title = item.getElementsByTagName('title')[0].textContent;
-            const link = item.getElementsByTagName('link')[0].textContent;
-            const imageUrl = item.getElementsByTagName('media:content')[0]?.getAttribute('url') || '';
+    for (let i = 0; i < items.length; i++) {
+        const item = items[i];
+        const title = item.getElementsByTagName('title')[0]?.textContent || 'Untitled';
+        const link = item.getElementsByTagName('link')[0]?.textContent || '';
+        const imageUrl = item.getElementsByTagName('media:content')[0]?.getAttribute('url') || '';
+        const pubDate = item.getElementsByTagName('pubDate')[0]?.textContent || '1970-01-01T00:00:00Z'; // Default to epoch if missing
 
-            rssItems.push({
-                id: generateUniqueId({ link, title }),
-                title,
-                link,
-                image: imageUrl,
-                type: 'rss'
-            });
-        }
+        rssItems.push({
+            id: generateUniqueId({ link, title }),
+            title,
+            link,
+            image: imageUrl,
+            pubDate, // Include publication date
+            type: 'rss',
+        });
+    }
 
-        return rssItems;
-    };
+    return rssItems;
+};
     
     const updateCacheWithFreshData = async () => {
     try {

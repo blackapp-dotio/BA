@@ -1,9 +1,14 @@
 workflows:
-  ios_build_local:
-    name: iOS Local Build
+  ios_testflight_build:
+    name: iOS TestFlight Build
     environment:
       xcode: latest
     scripts:
+      - name: Configure code signing
+        script: |
+          security import ./ios-signing/DCertificate.p12 -P $CERTIFICATE_PASSWORD -A
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp ./ios-signing/BlackApp_App_Store_Profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
       - name: Install dependencies
         script: |
           npm install
@@ -23,3 +28,10 @@ workflows:
                      -exportPath $CM_BUILD_DIR
     artifacts:
       - $CM_BUILD_DIR/*.ipa
+    publishing:
+      app_store_connect:
+        apple_id: $APPLE_ID
+        team_id: $TEAM_ID
+        api_key_id: $APP_STORE_CONNECT_KEY_ID
+        api_issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
