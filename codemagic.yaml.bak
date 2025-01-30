@@ -2,6 +2,12 @@ workflows:
   ios_testflight_build:
     name: iOS TestFlight Build
     environment:
+      vars:
+        CERTIFICATE_PASSWORD: $CERTIFICATE_PASSWORD # Password for the .p12 file
+        APPLE_ID: achiri.emmanuel@yahoo.com # Your Apple Developer account email
+        APP_STORE_CONNECT_KEY_ID: <Your_App_Store_Connect_Key_ID> # Key ID for the API key
+        APP_STORE_CONNECT_ISSUER_ID: <Your_App_Store_Connect_Issuer_ID> # Issuer ID for the API key
+        APP_STORE_CONNECT_PRIVATE_KEY: <Your_Private_Key_Content> # Content of the .p8 file
       xcode: latest
     scripts:
       - name: Configure code signing
@@ -31,7 +37,7 @@ workflows:
     publishing:
       app_store_connect:
         apple_id: $APPLE_ID
-        team_id: $TEAM_ID
-        api_key_id: $APP_STORE_CONNECT_KEY_ID
-        api_issuer_id: $APP_STORE_CONNECT_ISSUER_ID
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
+        api_key:
+          key_id: $APP_STORE_CONNECT_KEY_ID
+          issuer_id: $APP_STORE_CONNECT_ISSUER_ID
+          private_key: $APP_STORE_CONNECT_PRIVATE_KEY

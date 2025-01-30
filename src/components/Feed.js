@@ -151,22 +151,21 @@ const fetchRSSFeeds = useCallback(async () => {
         return Array.from(uniqueItemsMap.values());
     };
 
-const loadMoreRSSFeeds = async (initial = false) => {
-    if (loadingMore) return;
+const loadMoreRSSFeeds = async () => {
+    if (loadingMore) return; // Prevent multiple simultaneous loads
 
-    setLoadingMore(true);
-    const rssContent = await fetchRSSFeeds();
+    setLoadingMore(true); // Set loading state to true
+    try {
+        const rssContent = await fetchRSSFeeds();
+        const newItems = rssContent.slice(startIndex, startIndex + itemsPerPage);
 
-    const newItems = rssContent.slice(
-        initial ? 0 : startIndex,
-        startIndex + itemsPerPage
-    );
-
-    setFeedContent(prevContent =>
-        deduplicateFeeds([...prevContent, ...newItems])
-    );
-    setStartIndex(initial ? itemsPerPage : startIndex + itemsPerPage);
-    setLoadingMore(false);
+        setFeedContent((prevContent) => deduplicateFeeds([...prevContent, ...newItems]));
+        setStartIndex(startIndex + itemsPerPage);
+    } catch (error) {
+        console.error('Error loading more RSS feeds:', error);
+    } finally {
+        setLoadingMore(false); // Ensure loading state is cleared
+    }
 };
 
 // Call with initial load flag
@@ -599,14 +598,14 @@ const renderFeedItem = (item) => {
             )}
             
                 <div className="feed">
-        {feedContent.length > 0 ? (
-            feedContent.map((item) => renderFeedItem(item))
-        ) : (
-            <Typography variant="h6">Loading feed...</Typography> // Placeholder for no cached content
-        )}
-        {loadingMore && <Typography variant="h6">Loading more content...</Typography>}
+            {feedContent.length > 0 ? (
+                feedContent.map((item) => renderFeedItem(item))
+            ) : (
+                <Typography variant="h6">Loading feed...</Typography> // Placeholder for empty feed
+            )}
+       
+        {loadingMore && <Typography variant="h6">Loading more content...</Typography>} {/* Single loading indicator */}
     </div>
-            
             {feedContent.map((item) => renderFeedItem(item))}
             {loadingMore && <Typography variant="h6">Loading more content...</Typography>}
             <Modal

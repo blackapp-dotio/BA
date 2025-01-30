@@ -18,7 +18,8 @@
     "express": "^4.19.2",
     "firebase-admin": "^13.0.2",
     "firebase-functions": "^3.24.0",
-    "square": "^38.0.0"
+    "square": "^38.0.0",
+    "ws": "^8.18.0"
   },
   "devDependencies": {
     "eslint": "^8.15.0",

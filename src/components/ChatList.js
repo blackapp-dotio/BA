@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ref, onValue, get, update } from 'firebase/database';
-import { database, auth, messaging } from '../firebase'; // Make sure messaging is initialized in firebase.js
-import { getToken, onMessage } from 'firebase/messaging'; // Explicitly importing Firebase messaging
+import { database, auth, messaging } from '../firebase';
+import { getToken, onMessage } from 'firebase/messaging';
 import ChatConversation from './ChatConversation';
 import GroupChat from './GroupChat';
 import SendAGMoney from './SendAGMoney';
@@ -13,20 +13,29 @@ const ChatList = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [chats, setChats] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
 
     useEffect(() => {
         const user = auth.currentUser;
         if (user) {
             const messagesRef = ref(database, 'messages');
+            const unreadRef = ref(database, `unread_messages/${user.uid}`);
+
+            // Listen for real-time updates of unread message count
+            onValue(unreadRef, (snapshot) => {
+                const count = snapshot.val() || 0;
+                setUnreadCount(count);
+                console.log(`Updated unread message count: ${count}`);
+            });
+
+            // Listen for new messages in real-time
             onValue(messagesRef, (snapshot) => {
                 const messagesData = snapshot.val();
                 const activeChats = [];
 
-                Object.keys(messagesData || {}).forEach(async key => {
+                Object.keys(messagesData || {}).forEach(async (key) => {
                     const message = messagesData[key];
                     const chatPartnerId = message.senderId === user.uid ? message.recipientId : message.senderId;
-
-                    // Check if the chat partner is followed by the current user
                     const isFollowing = await isUserFollowing(chatPartnerId);
 
                     if (isFollowing) {
@@ -56,24 +65,17 @@ const ChatList = () => {
                     }
                 });
 
-                const sortedChats = activeChats.sort((a, b) => {
-                    if (a.isUnread === b.isUnread) {
-                        return b.timestamp - a.timestamp;
-                    }
-                    return b.unreadCount - a.unreadCount;
-                });
-
+                const sortedChats = activeChats.sort((a, b) => b.timestamp - a.timestamp);
                 setChats(sortedChats);
                 setFilteredUsers(sortedChats);
             });
 
-            // Request push notification permission and handle notifications
             requestPushNotificationPermission();
             onMessageListener();
         }
     }, []);
 
-    // Check if current user follows the chat partner
+    // Check if the user follows the chat partner
     const isUserFollowing = async (chatPartnerId) => {
         const followingRef = ref(database, `following/${auth.currentUser.uid}`);
         const followingSnapshot = await get(followingRef);
@@ -94,19 +96,13 @@ const ChatList = () => {
         if (chat) {
             setSelectedChat(chat);
 
-            if (chat.isUnread) {
-                const updatedMessages = {};
-                const messagesRef = ref(database, 'messages');
-                onValue(messagesRef, (snapshot) => {
-                    const messagesData = snapshot.val();
-                    Object.keys(messagesData || {}).forEach(key => {
-                        const message = messagesData[key];
-                        if (message.senderId === userId && message.recipientId === auth.currentUser.uid && !message.isRead) {
-                            updatedMessages[`/messages/${key}/isRead`] = true;
-                        }
-                    });
-                    update(ref(database), updatedMessages);
-                });
+            if (chat.unreadCount > 0) {
+                update(ref(database, `unread_messages/${auth.currentUser.uid}`), { count: 0 });
+                setChats((prevChats) =>
+                    prevChats.map((c) =>
+                        c.userId === userId ? { ...c, unreadCount: 0 } : c
+                    )
+                );
             }
         }
     };
@@ -114,7 +110,7 @@ const ChatList = () => {
     // Request push notification permissions and get token
     const requestPushNotificationPermission = async () => {
         try {
-            const token = await getToken(messaging, { vapidKey: 'BKxHDuFsSccMzKisFGeJFuhTqmLFvySxRk5Y3O81YoKlTKMytDTxfcB2N0Dk88jQE2APQ8KvFD5REzSsyj0YqqA' }); // Replace with your VAPID key
+            const token = await getToken(messaging, { vapidKey: 'BKxHDuFsSccMzKisFGeJFuhTqmLFvySxRk5Y3O81YoKlTKMytDTxfcB2N0Dk88jQE2APQ8KvFD5REzSsyj0YqqA' });
             console.log('FCM Token:', token);
         } catch (error) {
             console.error('Error getting FCM token:', error);
@@ -124,9 +120,21 @@ const ChatList = () => {
     // Listen for incoming push notifications
     const onMessageListener = () => {
         onMessage(messaging, (payload) => {
-            console.log('Message received: ', payload);
-            // Handle showing a notification or updating UI with the message
+            console.log('New message received:', payload);
+            if (payload.notification) {
+                showNotification(payload.notification);
+            }
         });
+    };
+
+    // Show browser notifications for new messages
+    const showNotification = (notification) => {
+        if (Notification.permission === 'granted') {
+            new Notification(notification.title, {
+                body: notification.body,
+                icon: '/chat-icon.png',
+            });
+        }
     };
 
     const renderTabContent = () => {
@@ -150,7 +158,7 @@ const ChatList = () => {
                                 <li
                                     key={chat.userId}
                                     onClick={() => startConversation(chat.userId)}
-                                    className={chat.isUnread ? 'unread' : ''}
+                                    className={chat.unreadCount > 0 ? 'unread' : ''}
                                 >
                                     <span className="display-name">{chat.displayName}</span>
                                     <span className="last-message">{chat.lastMessage}</span>
@@ -179,7 +187,7 @@ const ChatList = () => {
                         setSelectedChat(null);
                     }}
                 >
-                    Active Chats
+                    Active Chats {unreadCount > 0 && <span className="unread-badge">({unreadCount})</span>}
                 </button>
                 <button
                     className={activeTab === 'groupChats' ? 'active' : ''}

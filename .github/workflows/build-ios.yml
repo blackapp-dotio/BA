@@ -1,0 +1,43 @@
+name: Build iOS App
+
+on:
+  push:
+    branches:
+      - main # Change to your development branch if needed
+
+jobs:
+  build:
+    runs-on: macos-latest # Runs the job on a macOS virtual machine
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Up Xcode
+        run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+
+      - name: Install Dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+
+      - name: Build iOS App
+        run: |
+          xcodebuild -workspace ios/BlackApp.xcworkspace \
+                     -scheme BlackApp \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive
+
+      - name: Export .ipa File
+        run: |
+          xcodebuild -exportArchive \
+                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
+                     -exportOptionsPlist ios/exportOptions.plist \
+                     -exportPath $GITHUB_WORKSPACE/build
+
+      - name: Upload .ipa as an Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: BlackApp-ipa
+          path: build/*.ipa

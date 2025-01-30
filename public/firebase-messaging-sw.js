@@ -1,6 +1,6 @@
-// Use importScripts to import Firebase scripts since Service Workers do not support ES module imports
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-app.js');
-importScripts('https://www.gstatic.com/firebasejs/9.0.0/firebase-messaging.js');
+importScripts("https://www.gstatic.com/firebasejs/10.4.0/firebase-app-compat.js");
+importScripts("https://www.gstatic.com/firebasejs/10.4.0/firebase-messaging-compat.js");
+
 
 // Initialize Firebase with your configuration
 firebase.initializeApp({

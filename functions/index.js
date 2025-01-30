@@ -1,4 +1,4 @@
-const functions = require('firebase-functions');
+const functions = require('firebase-functions'); 
 const admin = require('firebase-admin');
 const express = require('express');
 const cors = require('cors');
@@ -31,8 +31,8 @@ app.get('/proxy', async (req, res) => {
             return res.status(response.status).send(`Failed to fetch resource: ${response.statusText}`);
         }
 
-        const data = await response.text(); // Retrieve the RSS feed data as text
-        res.set('Content-Type', 'application/xml'); // Ensure correct content type for RSS/Atom feeds
+        const data = await response.text();
+        res.set('Content-Type', 'application/xml'); 
         return res.status(200).send(data);
     } catch (error) {
         console.error('Error in proxy:', error.message);
@@ -41,7 +41,7 @@ app.get('/proxy', async (req, res) => {
 });
 
 /**
- * Example: Payment Processing Endpoint
+ * Payment Processing Endpoint
  */
 app.post('/process-payment', async (req, res) => {
     const { sourceId, amount } = req.body;
@@ -50,17 +50,16 @@ app.post('/process-payment', async (req, res) => {
         return res.status(400).send('sourceId or amount is missing');
     }
 
-    const feeAmount = Math.floor(amount * 0.02); // 2% platform fee in cents
+    const feeAmount = Math.floor(amount * 0.02);
 
     try {
-        // Simulate payment processing and record the transaction
         const transactionRef = admin.database().ref('transactions').push();
         await transactionRef.set({
             id: transactionRef.key,
             senderId: req.body.senderId,
             recipientId: req.body.recipientId,
             amount,
-            status: 'pending', // Initial status is set to pending
+            status: 'pending',
             platformFee: feeAmount,
             timestamp: Date.now(),
         });
@@ -72,5 +71,44 @@ app.post('/process-payment', async (req, res) => {
     }
 });
 
-// Export the Express app for Firebase Functions
+/**
+ * Firebase Realtime Database Trigger - Notify on New Messages
+ */
+exports.sendNewMessageNotification = functions.database.ref('/messages/{messageId}')
+    .onCreate(async (snapshot, context) => {
+        const message = snapshot.val();
+        console.log('New message detected:', message);
+
+        if (!message.recipientId) {
+            console.error('Message recipient is missing');
+            return null;
+        }
+
+        try {
+            const recipientRef = admin.database().ref(`/users/${message.recipientId}`);
+            const recipientSnapshot = await recipientRef.once('value');
+            const recipientData = recipientSnapshot.val();
+
+            if (!recipientData) {
+                console.error('Recipient user data not found');
+                return null;
+            }
+
+            // Store unread message count
+            const unreadRef = admin.database().ref(`/unread_messages/${message.recipientId}`);
+            const unreadSnapshot = await unreadRef.once('value');
+            let unreadCount = unreadSnapshot.val() || 0;
+            unreadCount += 1;
+            await unreadRef.set(unreadCount);
+
+            console.log(`New unread message count for ${message.recipientId}:`, unreadCount);
+        } catch (error) {
+            console.error('Error updating unread message count:', error);
+        }
+        return null;
+    });
+
+/**
+ * Export the Express app as an HTTP function
+ */
 exports.api = functions.https.onRequest(app);
