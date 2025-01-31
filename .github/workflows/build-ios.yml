@@ -31,6 +31,10 @@ jobs:
         run: |
           cd ios
           pod install --repo-update
+          
+      - name: Install Webpack Manually
+        run: npm install webpack webpack-dev-server --save-dev
+    
 
       - name: Build React App
         env:
@@ -56,6 +60,8 @@ jobs:
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
                      -exportOptionsPlist ios/exportOptions.plist \
                      -exportPath $GITHUB_WORKSPACE/build
+                     
+                     
 
       - name: Upload .ipa as an Artifact
         uses: actions/upload-artifact@v3

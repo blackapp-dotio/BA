@@ -29,6 +29,7 @@
     "postprocessing": "^6.36.4",
     "process": "^0.11.10",
     "qrcode": "^1.5.4",
+    "cross-env": "^7.0.3",
     "react-app-rewired": "^2.2.1",
     "react-camera-pro": "^1.4.0",
     "react-emoji-picker": "^1.0.13",
@@ -72,12 +73,13 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "ajv": "^8.8.2",
-    "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.37.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "styled-components": "^6.1.14"
+    "styled-components": "^6.1.14",
+    "webpack": "^4.47.0",
+    "webpack-dev-server": "^3.11.3"
   }
 }
