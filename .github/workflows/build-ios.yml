@@ -7,13 +7,12 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # Use a powerful macOS runner
+    runs-on: macos-14  # Use a more powerful macOS runner
 
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # 🔹 Enable Swap Memory to prevent out-of-memory errors
       - name: Enable Swap Memory
         run: |
           sudo fallocate -l 8G /swapfile
@@ -22,24 +21,21 @@ jobs:
           sudo swapon /swapfile
           free -h
 
-      # 🔹 Optimize Node.js memory settings
       - name: Set Node.js Memory Limit
         run: echo "NODE_OPTIONS=--max-old-space-size=12288" >> $GITHUB_ENV
 
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
-      # 🔹 Install CocoaPods dependencies
       - name: Install Dependencies
         run: |
           cd ios
           pod install --repo-update
 
-      # 🔹 Install Webpack (fixes module issues)
       - name: Install Webpack Manually
         run: npm install webpack webpack-dev-server --save-dev
 
-      # 🔹 Import Code Signing Certificate
+      # 🔹 Import and configure the signing certificate
       - name: Import Distribution Certificate
         env:
           DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
@@ -53,7 +49,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           rm -f signing.p12
 
-      # 🔹 Install Provisioning Profile
+      # 🔹 Install provisioning profile
       - name: Install Provisioning Profile
         env:
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
@@ -62,45 +58,34 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
-      # 🔹 Build React App (ensure JS build is stable)
       - name: Build React App
         env:
-          CI: false  # Prevent excessive logging
+          CI: false  # Prevents unnecessary logging that consumes memory
         run: npm run build
-
-      # 🔹 Build iOS App (Ensures proper signing & configuration)
+        
       - name: Build iOS App
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           xcodebuild -workspace ios/BlackApp.xcworkspace \
                      -scheme BlackApp \
                      -sdk iphoneos \
                      -configuration Release \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
-                     CODE_SIGN_STYLE=Manual \
-                     DEVELOPMENT_TEAM=$TEAM_ID \
-                     PROVISIONING_PROFILE_SPECIFIER=BlackApp
+                     DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
 
-      # 🔹 Export the .ipa file (Ensures proper signing & provisioning)
       - name: Export .ipa File
-        env:
-          TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           xcodebuild -exportArchive \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
                      -exportOptionsPlist ios/exportOptions.plist \
                      -exportPath $GITHUB_WORKSPACE/build \
                      -allowProvisioningUpdates \
-                     CODE_SIGN_STYLE=Manual \
-                     DEVELOPMENT_TEAM=$TEAM_ID \
-                     PROVISIONING_PROFILE_SPECIFIER=BlackApp
+                     DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
 
-      # 🔹 Upload the .ipa file as an artifact for easy download
       - name: Upload .ipa as an Artifact
         uses: actions/upload-artifact@v3
         with:
