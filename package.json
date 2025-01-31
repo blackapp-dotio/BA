@@ -41,16 +41,15 @@
     "square": "^37.1.1",
     "three": "^0.170.0",
     "web-vitals": "^2.1.4",
-    "webpack": "^4.47.0",
     "ws": "^8.18.0"
   },
-  "scripts": {
-    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-app-rewired start",
-    "build": "cross-env NODE_OPTIONS=--openssl-legacy-provider --max-old-space-size=12288 react-app-rewired build",
-    "test": "cross-env react-app-rewired test"
+"scripts": {
+  "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-app-rewired start",
+  "build": "cross-env CI=false NODE_OPTIONS='--max-old-space-size=16384 --openssl-legacy-provider' GENERATE_SOURCEMAP=false npm run build"
+  "test": "cross-env react-app-rewired test"
   },
   "resolutions": {
-    "webpack": "4"
+  "webpack": "4"
   },
   "eslintConfig": {
     "extends": [
@@ -73,7 +72,6 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "ajv": "^8.8.2",
-    "cross-env": "^7.0.3",
     "eslint": "^9.18.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.37.4",
