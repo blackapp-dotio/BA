@@ -27,27 +27,25 @@
     "jspdf": "^2.5.2",
     "node-fetch": "^3.3.2",
     "postprocessing": "^6.36.4",
-    "process": "^0.11.10",
     "qrcode": "^1.5.4",
     "react-camera-pro": "^1.4.0",
     "react-emoji-picker": "^1.0.13",
     "react-icons": "^5.3.0",
     "react-qr-reader": "^3.0.0-beta-1",
     "react-router-dom": "^6.26.0",
-    "react-scripts": "^5.0.1",
+    "react-scripts": "^3.0.1",
     "react-select": "^5.8.0",
     "react-square-web-payments-sdk": "^3.2.1",
     "square": "^37.1.1",
     "three": "^0.170.0",
     "web-vitals": "^2.1.4",
-    "webpack": "^4.47.0",
     "ws": "^8.18.0"
   },
   "scripts": {
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "GENERATE_SOURCEMAP=false NODE_OPTIONS='--max-old-space-size=12288' react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start": "react-app-rewired --openssl-legacy-provider start",
+    "build": "GENERATE_SOURCEMAP=false NODE_OPTIONS='--max-old-space-size=12288' react-app-rewired build",
+    "test": "react-app-rewired test",
+    "eject": "react-app-rewired eject"
   },
   "resolutions": {
     "webpack": "4"
@@ -73,11 +71,18 @@
   "devDependencies": {
     "@babel/core": "^7.26.0",
     "ajv": "^8.8.2",
+    "assert": "^2.1.0",
+    "buffer": "^6.0.3",
+    "crypto-browserify": "^3.12.1",
     "eslint": "^9.18.0",
     "eslint-config-google": "^0.14.0",
     "eslint-plugin-react": "^7.37.4",
+    "process": "^0.11.10",
     "react": "^18.3.1",
+    "react-app-rewired": "^2.2.1",
     "react-dom": "^18.3.1",
-    "styled-components": "^6.1.14"
+    "stream-browserify": "^3.0.0",
+    "styled-components": "^6.1.14",
+    "util": "^0.12.5"
   }
 }
