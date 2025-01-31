@@ -27,19 +27,14 @@ jobs:
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
-      - name: Install Dependencies
+      - name: Build React App
+        env:
+          NODE_OPTIONS: "--openssl-legacy-provider --max-old-space-size=12288"
+          CI: false
+          GENERATE_SOURCEMAP: false
         run: |
-          cd ios
-          pod install --repo-update
-
-	- name: Build React App
-  	  env:
-    	    NODE_OPTIONS: "--openssl-legacy-provider --max-old-space-size=12288"
-         CI: false
-         GENERATE_SOURCEMAP: false
-       run: |
-         export NODE_OPTIONS=--openssl-legacy-provider
-         npm run build
+          export NODE_OPTIONS="--openssl-legacy-provider"
+          npm run build
 
 
       - name: Build iOS App
