@@ -31,10 +31,32 @@ jobs:
         run: |
           cd ios
           pod install --repo-update
-          
+
       - name: Install Webpack Manually
         run: npm install webpack webpack-dev-server --save-dev
-    
+
+      # 🔹 Import and configure the signing certificate
+      - name: Import Distribution Certificate
+        env:
+          DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode > signing.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import signing.p12 -t agg -k build.keychain -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          rm -f signing.p12
+
+      # 🔹 Install provisioning profile
+      - name: Install Provisioning Profile
+        env:
+          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+        run: |
+          echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
       - name: Build React App
         env:
@@ -55,13 +77,13 @@ jobs:
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive
 
       - name: Export .ipa File
+        env:
+          TEAM_ID: ${{ secrets.TEAM_ID }}
         run: |
           xcodebuild -exportArchive \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
                      -exportOptionsPlist ios/exportOptions.plist \
                      -exportPath $GITHUB_WORKSPACE/build
-                     
-                     
 
       - name: Upload .ipa as an Artifact
         uses: actions/upload-artifact@v3
