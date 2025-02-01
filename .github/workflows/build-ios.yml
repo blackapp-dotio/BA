@@ -62,7 +62,7 @@ jobs:
         env:
           CI: false  # Prevents unnecessary logging that consumes memory
         run: npm run build
-        
+
       - name: Build iOS App
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -77,14 +77,36 @@ jobs:
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
                      DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
 
-      - name: Export .ipa File
+      # 🔹 ✅ Manually Sign and Export .ipa using xcrun (Alternative to `xcodebuild -exportArchive`)
+      - name: Manually Sign and Export .ipa
+        env:
+          TEAM_ID: A7Q8XT75CC
+          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+          DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
         run: |
-          xcodebuild -exportArchive \
-                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
-                     -exportOptionsPlist ios/exportOptions.plist \
-                     -exportPath $GITHUB_WORKSPACE/build \
-                     -allowProvisioningUpdates \
-                     DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
+          # ✅ Convert base64 provisioning profile back to file
+          echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+          # ✅ Convert base64 distribution certificate
+          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode > signing.p12
+          
+          # ✅ Import Certificate to Keychain
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import signing.p12 -t agg -k build.keychain -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          rm -f signing.p12
+
+          # ✅ Manually export .ipa using xcrun
+          xcrun -sdk iphoneos PackageApplication \
+            -v $GITHUB_WORKSPACE/build/BlackApp.xcarchive/Products/Applications/BlackApp.app \
+            -o $GITHUB_WORKSPACE/build/BlackApp.ipa \
+            -embed ~/Library/MobileDevice/Provisioning\ Profiles/BlackApp.mobileprovision \
+            -sign "Apple Distribution"
 
       - name: Upload .ipa as an Artifact
         uses: actions/upload-artifact@v3
