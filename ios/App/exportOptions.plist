@@ -8,7 +8,7 @@
   <string>manual</string>
   <key>provisioningProfiles</key>
   <dict>
-    <key>com.blackapp-store</key> <!-- Replace this with your app's bundle identifier -->
+    <key>com.blackapp</key> <!-- Replace this with your app's bundle identifier -->
     <string></string> <!-- Leave this empty for unsigned builds -->
   </dict>
   <key>A7Q8XT75CC</key>
