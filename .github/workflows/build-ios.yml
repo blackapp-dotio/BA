@@ -41,7 +41,7 @@ jobs:
           DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
           DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
         run: |
-          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode > signing.p12
+          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode -o signing.p12  # ✅ Just decoding
           security create-keychain -p "" build.keychain
           security default-keychain -s build.keychain
           security unlock-keychain -p "" build.keychain
@@ -54,9 +54,10 @@ jobs:
         env:
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
         run: |
-          echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
+          echo "$PROVISIONING_PROFILE" | base64 --decode -o BlackApp.mobileprovision  # ✅ Just decoding
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+          ls -la ~/Library/MobileDevice/Provisioning\ Profiles/  # ✅ Verify installation
 
       - name: Build React App
         env:
@@ -76,6 +77,8 @@ jobs:
                      -configuration Release \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
                      DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
+                     CODE_SIGN_IDENTITY="Apple Distribution" \
+                     PROVISIONING_PROFILE_SPECIFIER="BlackApp App Store Profile"
 
       # 🔹 ✅ Manually Sign and Export .ipa using xcrun (Alternative to `xcodebuild -exportArchive`)
       - name: Manually Sign and Export .ipa
