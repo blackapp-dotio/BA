@@ -1,4 +1,4 @@
-name: Build & Upload iOS App
+name: Build iOS App
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # Use a more powerful macOS runner
+    runs-on: macos-14  # ✅ Use latest macOS runner
 
     steps:
       - name: Checkout Repository
@@ -35,7 +35,7 @@ jobs:
       - name: Install Webpack Manually
         run: npm install webpack webpack-dev-server --save-dev
 
-      # 🔹 Import and configure the signing certificate
+      # ✅ Import Distribution Certificate
       - name: Import Distribution Certificate
         env:
           DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
@@ -49,7 +49,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           rm -f signing.p12
 
-      # 🔹 Install provisioning profile
+      # ✅ Install Provisioning Profile
       - name: Install Provisioning Profile
         env:
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
@@ -60,10 +60,11 @@ jobs:
 
       - name: Build React App
         env:
-          CI: false  # Prevents unnecessary logging that consumes memory
+          CI: false  # ✅ Prevents unnecessary logging that consumes memory
         run: npm run build
-        
-      - name: Build iOS App & Upload to App Store Connect
+
+      # ✅ Build & Archive iOS App
+      - name: Build & Archive iOS App
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
@@ -75,12 +76,14 @@ jobs:
                      -sdk iphoneos \
                      -configuration Release \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
-                     DEVELOPMENT_TEAM=A7Q8XT75CC   # ✅ Hardcoded Team ID
+                     CODE_SIGN_IDENTITY="Apple Distribution" \
+                     DEVELOPMENT_TEAM="A7Q8XT75CC" \
+                     PROVISIONING_PROFILE_SPECIFIER="BlackApp App Store Profile" \
+                     -allowProvisioningUpdates
 
-          # 🚀 **Upload Directly to App Store Connect (TestFlight)**
-          xcodebuild -uploadArchive \
-                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
-                     -allowProvisioningUpdates \
-                     -authenticationKeyPath $GITHUB_WORKSPACE/AuthKey.p8 \
-                     -authenticationKeyID $APP_STORE_CONNECT_KEY_ID \
-                     -authenticationKeyIssuerID $APP_STORE_CONNECT_ISSUER_ID
+      # ✅ Upload `.xcarchive` to GitHub (Instead of `.ipa`)
+      - name: Upload .xcarchive as an Artifact
+        uses: actions/upload-artifact@v4  # ✅ Updated to latest version
+        with:
+          name: BlackApp-xcarchive
+          path: build/BlackApp.xcarchive
