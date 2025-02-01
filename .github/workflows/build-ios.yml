@@ -80,20 +80,16 @@ jobs:
                      DEVELOPMENT_TEAM="A7Q8XT75CC" \
                      PRODUCT_BUNDLE_IDENTIFIER="com.blackapp"
 
-      - name: Export .ipa File
+      - name: Upload to App Store Connect
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
         run: |
-          xcodebuild -exportArchive \
-                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive \
-                     -exportOptionsPlist ios/exportOptions.plist \
-                     -exportPath $GITHUB_WORKSPACE/build \
-                     -allowProvisioningUpdates \
-                     CODE_SIGN_IDENTITY="iPhone Distribution" \
-                     PROVISIONING_PROFILE_SPECIFIER="BlackApp App Store Profile" \
-                     DEVELOPMENT_TEAM="A7Q8XT75CC" \
-                     PRODUCT_BUNDLE_IDENTIFIER="com.blackapp"
-
-      - name: Upload .ipa as an Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BlackApp-ipa
-          path: build/*.ipa
+          xcrun altool --upload-app \
+            --type ios \
+            --file build/BlackApp.xcarchive \
+            --apple-id "$APPLE_ID" \
+            --apiKey "$APP_STORE_CONNECT_KEY_ID" \
+            --apiIssuer "$APP_STORE_CONNECT_ISSUER_ID"
