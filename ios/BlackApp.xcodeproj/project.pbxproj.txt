@@ -1,0 +1,28 @@
+// !$*UTF8*$!
+{
+    archiveVersion = 1;
+    classes = {};
+    objectVersion = 46;
+    rootObject = PROJECT_ID;
+    objects = {
+        PROJECT_ID = {
+            isa = PBXProject;
+            attributes = {
+                LastUpgradeCheck = 1300;
+                TargetAttributes = {
+                    TARGET_ID = {
+                        DevelopmentTeam = A7Q8XT75CC;
+                        ProvisioningStyle = Automatic;
+                    };
+                };
+            };
+            buildConfigurationList = CONFIGURATION_ID;
+            compatibilityVersion = "Xcode 13.0";
+            developmentRegion = en;
+            hasScannedForEncodings = 0;
+            knownRegions = (en);
+            mainGroup = MAIN_GROUP;
+            targets = (TARGET_ID);
+        };
+    };
+}

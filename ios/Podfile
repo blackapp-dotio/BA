@@ -1,24 +1,33 @@
-require_relative '../../node_modules/@capacitor/ios/scripts/pods_helpers'
+platform :ios, '14.0'  # ✅ Set correct iOS version
 
-platform :ios, '13.0'
-use_frameworks!
+require_relative '../node_modules/react-native/scripts/react_native_pods'
+require_relative '../node_modules/@react-native-community/cli-platform-ios/native_modules'
 
-# workaround to avoid Xcode caching of Pods that requires
-# Product -> Clean Build Folder after new Cordova plugins installed
-# Requires CocoaPods 1.6 or newer
-install! 'cocoapods', :disable_input_output_paths => true
+target 'BlackApp' do
+  config = use_native_modules!
 
-def capacitor_pods
-  pod 'Capacitor', :path => '../../node_modules/@capacitor/ios'
-  pod 'CapacitorCordova', :path => '../../node_modules/@capacitor/ios'
+  use_react_native!(
+    :path => config[:reactNativePath],
+    :hermes_enabled => false   # ✅ Change to true if using Hermes
+  )
 
-end
+  pod 'React', :path => '../node_modules/react-native/React'
+  pod 'React-Core', :path => '../node_modules/react-native/React'
+  pod 'React-RCTLinking', :path => '../node_modules/react-native/Libraries/Linking'
+  pod 'React-RCTNetwork', :path => '../node_modules/react-native/Libraries/Network'
+  pod 'React-RCTSettings', :path => '../node_modules/react-native/Libraries/Settings'
+  pod 'React-RCTText', :path => '../node_modules/react-native/Libraries/Text'
+  pod 'React-RCTVibration', :path => '../node_modules/react-native/Libraries/Vibration'
+  pod 'React-Core/RCTWebSocket', :path => '../node_modules/react-native/React'
 
-target 'App' do
-  capacitor_pods
-  # Add your Pods here
-end
-
-post_install do |installer|
-  assertDeploymentTarget(installer)
+  # ✅ Automatically manage signing & provisioning
+  post_install do |installer|
+    installer.pods_project.targets.each do |target|
+      target.build_configurations.each do |config|
+        config.build_settings['DEVELOPMENT_TEAM'] = 'A7Q8XT75CC'  # ✅ Your Team ID
+        config.build_settings['CODE_SIGN_STYLE'] = 'Automatic'
+        config.build_settings['PROVISIONING_PROFILE_SPECIFIER'] = ''  # ✅ Auto manage
+      end
+    end
+  end
 end
