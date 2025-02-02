@@ -26,6 +26,13 @@ jobs:
 
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
+        
+      - name: Clear Yarn/NPM and CocoaPods Cache
+        run: |
+          npm cache clean --force
+          rm -rf ios/Pods ios/Podfile.lock
+          pod cache clean --all
+ 
 
       - name: Install Dependencies
         run: |
@@ -64,22 +71,23 @@ jobs:
         run: npm run build
 
       # ✅ Build & Archive iOS App
-      - name: Build & Archive iOS App
+      - name: Build iOS App (Archive Only)
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
           APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
           APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          TEAM_ID: A7Q8XT75CC  # Hardcoded Team ID
         run: |
           xcodebuild -workspace ios/BlackApp.xcworkspace \
                      -scheme BlackApp \
                      -sdk iphoneos \
                      -configuration Release \
                      -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
-                     CODE_SIGN_IDENTITY="Apple Distribution" \
-                     DEVELOPMENT_TEAM="A7Q8XT75CC" \
-                     PROVISIONING_PROFILE_SPECIFIER="BlackApp App Store Profile" \
-                     -allowProvisioningUpdates
+                     CODE_SIGN_IDENTITY="iPhone Developer" \
+                     DEVELOPMENT_TEAM=$TEAM_ID \
+                     PROVISIONING_PROFILE_SPECIFIER="" \
+                     CODE_SIGN_STYLE=Manual
 
       # ✅ Upload `.xcarchive` to GitHub (Instead of `.ipa`)
       - name: Upload .xcarchive as an Artifact
