@@ -72,43 +72,7 @@ app.post('/process-payment', async (req, res) => {
 });
 
 /**
- * Firebase Realtime Database Trigger - Notify on New Messages
- */
-exports.sendNewMessageNotification = functions.database.ref('/messages/{messageId}')
-    .onCreate(async (snapshot, context) => {
-        const message = snapshot.val();
-        console.log('New message detected:', message);
-
-        if (!message.recipientId) {
-            console.error('Message recipient is missing');
-            return null;
-        }
-
-        try {
-            const recipientRef = admin.database().ref(`/users/${message.recipientId}`);
-            const recipientSnapshot = await recipientRef.once('value');
-            const recipientData = recipientSnapshot.val();
-
-            if (!recipientData) {
-                console.error('Recipient user data not found');
-                return null;
-            }
-
-            // Store unread message count
-            const unreadRef = admin.database().ref(`/unread_messages/${message.recipientId}`);
-            const unreadSnapshot = await unreadRef.once('value');
-            let unreadCount = unreadSnapshot.val() || 0;
-            unreadCount += 1;
-            await unreadRef.set(unreadCount);
-
-            console.log(`New unread message count for ${message.recipientId}:`, unreadCount);
-        } catch (error) {
-            console.error('Error updating unread message count:', error);
-        }
-        return null;
-    });
-
-/**
  * Export the Express app as an HTTP function
  */
 exports.api = functions.https.onRequest(app);
+
