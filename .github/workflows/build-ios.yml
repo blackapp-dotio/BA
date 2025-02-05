@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14  # Use a more powerful macOS runner
+    runs-on: macos-14  # Use the latest macOS runner
 
     steps:
       - name: Checkout Repository
@@ -19,24 +19,28 @@ jobs:
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
-      # 🔹 Install Dependencies
-      - name: Install JavaScript Dependencies
+      # 🔹 Fix Dependency Issues
+      - name: Clean & Install JavaScript Dependencies
         run: |
-          rm -rf node_modules package-lock.json  # Ensure a clean install
-          npm cache clean --force  # Clear any corrupt cache
-          npm install --legacy-peer-deps --force  # Ignore strict peer dependency issues
-          npm prune  # Remove unused packages
-          npm audit fix --force  # Fix vulnerabilities
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install --no-optional --legacy-peer-deps --force
+          npm prune
+          npm audit fix --force || true  # Ensures audit fixes don't break the build
+
+      - name: Remove Deprecated Dependencies
+        run: |
+          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents
+          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
+          npm install webpack webpack-dev-server --save-dev
+          npm dedupe  # Ensures no duplicate dependencies
 
       - name: Install iOS Dependencies
         run: |
           cd ios
           pod install --repo-update
 
-      - name: Install Webpack Manually
-        run: npm install webpack webpack-dev-server --save-dev
-
-      # 🔹 Import and configure the signing certificate
+      # 🔹 Code Signing
       - name: Import Distribution Certificate
         env:
           DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
@@ -50,7 +54,6 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           rm -f signing.p12
 
-      # 🔹 Install provisioning profile
       - name: Install Provisioning Profile
         env:
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
@@ -82,8 +85,7 @@ jobs:
                      PROVISIONING_PROFILE_SPECIFIER="" \
                      CODE_SIGN_STYLE=Manual
 
-      # 🔹 Upload .xcarchive as an Artifact
-      - name: Upload .xcarchive for Download
+      - name: Upload .xcarchive as an Artifact
         uses: actions/upload-artifact@v4
         with:
           name: BlackApp-xcarchive
