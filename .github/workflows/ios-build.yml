@@ -1,93 +1,87 @@
-name: Build iOS App
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  build:
-    runs-on: macos-14  # Use the latest macOS runner
-
-    steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v3
-
-      - name: Set Node.js Memory Limit
-        run: echo "NODE_OPTIONS=--max-old-space-size=12288" >> $GITHUB_ENV
-
-      - name: Force Garbage Collection
-        run: node --expose-gc -e 'gc()'
-
-      # 🔹 Fix Dependency Issues
-      - name: Clean & Install JavaScript Dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install --no-optional --legacy-peer-deps --force
-          npm prune
-          npm audit fix --force || true  # Ensures audit fixes don't break the build
-
-      - name: Remove Deprecated Dependencies
-        run: |
-          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents
-          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
-          npm install webpack webpack-dev-server --save-dev
-          npm dedupe  # Ensures no duplicate dependencies
-
-      - name: Install iOS Dependencies
-        run: |
-          cd ios
-          pod install --repo-update
-
-      # 🔹 Code Signing
-      - name: Import Distribution Certificate
-        env:
-          DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
-          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
-        run: |
-          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode > signing.p12
-          security create-keychain -p "" build.keychain
-          security default-keychain -s build.keychain
-          security unlock-keychain -p "" build.keychain
-          security import signing.p12 -t agg -k build.keychain -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" -A
-          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
-          rm -f signing.p12
-
-      - name: Install Provisioning Profile
-        env:
-          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
-        run: |
-          echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-
-      - name: Build React App
-        env:
-          CI: false  # Prevents unnecessary logging that consumes memory
-        run: npm run build
-
-      - name: Build iOS App (Archive Only)
-        env:
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
-          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
-          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
-          TEAM_ID: A7Q8XT75CC  # Hardcoded Team ID
-        run: |
-          xcodebuild -workspace ios/BlackApp.xcworkspace \
-                     -scheme BlackApp \
-                     -sdk iphoneos \
-                     -configuration Release \
-                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
-                     CODE_SIGN_IDENTITY="iPhone Distribution" \
-                     DEVELOPMENT_TEAM=$TEAM_ID \
-                     PROVISIONING_PROFILE_SPECIFIER="" \
-                     CODE_SIGN_STYLE=Manual
-
-      - name: Upload .xcarchive as an Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: BlackApp-xcarchive
-          path: build/BlackApp.xcarchive
+{
+  "name": "BlackApp",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@capacitor/android": "^6.1.2",
+    "@capacitor/cli": "^6.1.2",
+    "@capacitor/core": "^6.1.2",
+    "@capacitor/ios": "^6.1.2",
+    "@emotion/react": "^11.13.0",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^5.16.7",
+    "@mui/material": "^5.16.7",
+    "@paypal/checkout-server-sdk": "^1.0.3",
+    "@react-native-community/cli": "latest",
+    "@square/web-sdk": "^2.0.1",
+    "@stripe/react-stripe-js": "^2.8.0",
+    "@stripe/stripe-js": "^4.3.0",
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "axios": "^1.7.2",
+    "cross-env": "^7.0.3",
+    "emoji-mart": "^5.6.0",
+    "emoji-picker-react": "^4.12.0",
+    "firebase": "^11.2.0",
+    "firebase-functions": "^6.3.0",
+    "jspdf": "^2.5.2",
+    "node-fetch": "^3.3.2",
+    "postprocessing": "^6.36.4",
+    "process": "^0.11.10",
+    "qrcode": "^1.5.4",
+    "react-app-rewired": "^2.2.1",
+    "react-camera-pro": "^1.4.0",
+    "react-emoji-picker": "^1.0.13",
+    "react-icons": "^5.3.0",
+    "react-qr-reader": "^3.0.0-beta-1",
+    "react-router-dom": "^6.26.0",
+    "react-scripts": "^5.0.1",
+    "react-select": "^5.8.0",
+    "react-square-web-payments-sdk": "^3.2.1",
+    "square": "^37.1.1",
+    "three": "^0.170.0",
+    "web-vitals": "^2.1.4",
+    "ws": "^8.18.0"
+  },
+  "scripts": {
+    "start": "cross-env NODE_OPTIONS=--openssl-legacy-provider react-app-rewired start",
+    "build": "cross-env CI=false NODE_OPTIONS='--max-old-space-size=16384 --openssl-legacy-provider' GENERATE_SOURCEMAP=false react-app-rewired build",
+    "test": "cross-env react-app-rewired test"
+  },
+  "resolutions": {
+    "webpack": "4"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@babel/core": "^7.26.0",
+    "ajv": "^8.8.2",
+    "eslint": "^8.57.1",
+    "eslint-config-google": "^0.14.0",
+    "eslint-config-react-app": "^7.0.1",
+    "eslint-plugin-react": "^7.37.4",
+    "react": "^17.0.2",
+    "react-dom": "^17.0.2",
+    "styled-components": "^5.3.11",
+    "webpack": "^5.97.1",
+    "webpack-dev-server": "^5.2.0"
+  }
+}
 
