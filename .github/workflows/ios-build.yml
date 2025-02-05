@@ -1,1 +1,93 @@
+name: Build iOS App
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: macos-14  # Use the latest macOS runner
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set Node.js Memory Limit
+        run: echo "NODE_OPTIONS=--max-old-space-size=12288" >> $GITHUB_ENV
+
+      - name: Force Garbage Collection
+        run: node --expose-gc -e 'gc()'
+
+      # 🔹 Fix Dependency Issues
+      - name: Clean & Install JavaScript Dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install --no-optional --legacy-peer-deps --force
+          npm prune
+          npm audit fix --force || true  # Ensures audit fixes don't break the build
+
+      - name: Remove Deprecated Dependencies
+        run: |
+          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents
+          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
+          npm install webpack webpack-dev-server --save-dev
+          npm dedupe  # Ensures no duplicate dependencies
+
+      - name: Install iOS Dependencies
+        run: |
+          cd ios
+          pod install --repo-update
+
+      # 🔹 Code Signing
+      - name: Import Distribution Certificate
+        env:
+          DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
+          DISTRIBUTION_CERTIFICATE_PASSWORD: ${{ secrets.DISTRIBUTION_CERTIFICATE_PASSWORD }}
+        run: |
+          echo "$DISTRIBUTION_CERTIFICATE" | base64 --decode > signing.p12
+          security create-keychain -p "" build.keychain
+          security default-keychain -s build.keychain
+          security unlock-keychain -p "" build.keychain
+          security import signing.p12 -t agg -k build.keychain -P "$DISTRIBUTION_CERTIFICATE_PASSWORD" -A
+          security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
+          rm -f signing.p12
+
+      - name: Install Provisioning Profile
+        env:
+          PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
+        run: |
+          echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
+      - name: Build React App
+        env:
+          CI: false  # Prevents unnecessary logging that consumes memory
+        run: npm run build
+
+      - name: Build iOS App (Archive Only)
+        env:
+          APPLE_ID: ${{ secrets.APPLE_ID }}
+          APP_STORE_CONNECT_KEY_ID: ${{ secrets.APP_STORE_CONNECT_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_PRIVATE_KEY: ${{ secrets.APP_STORE_CONNECT_PRIVATE_KEY }}
+          TEAM_ID: A7Q8XT75CC  # Hardcoded Team ID
+        run: |
+          xcodebuild -workspace ios/BlackApp.xcworkspace \
+                     -scheme BlackApp \
+                     -sdk iphoneos \
+                     -configuration Release \
+                     -archivePath $GITHUB_WORKSPACE/build/BlackApp.xcarchive archive \
+                     CODE_SIGN_IDENTITY="iPhone Distribution" \
+                     DEVELOPMENT_TEAM=$TEAM_ID \
+                     PROVISIONING_PROFILE_SPECIFIER="" \
+                     CODE_SIGN_STYLE=Manual
+
+      - name: Upload .xcarchive as an Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlackApp-xcarchive
+          path: build/BlackApp.xcarchive
 
