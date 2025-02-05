@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-
+      
 jobs:
   build:
     runs-on: macos-14  # Use a more powerful macOS runner
@@ -21,10 +21,11 @@ jobs:
 
       - name: Install JavaScript Dependencies
         run: |
-          rm -rf node_modules package-lock.json  # Remove old dependencies
-          npm cache clean --force  # Ensure a fresh cache
-          npm install --legacy-peer-deps  # Prevent dependency conflicts
-          npm audit fix  # Fix minor vulnerabilities (but avoid breaking changes)
+          rm -rf node_modules package-lock.json  # Ensure a clean install
+          npm cache clean --force  # Clear any corrupt cache
+          npm install --legacy-peer-deps  # Avoid strict peer dependency issues
+          npm audit fix --force  # Fix any potential vulnerabilities
+
 
 
       - name: Install iOS Dependencies
@@ -87,3 +88,6 @@ jobs:
         with:
           name: BlackApp-xcarchive
           path: build/BlackApp.xcarchive
+
+
+
