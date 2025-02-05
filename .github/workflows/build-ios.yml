@@ -4,7 +4,7 @@ on:
   push:
     branches:
       - main
-      
+
 jobs:
   build:
     runs-on: macos-14  # Use a more powerful macOS runner
@@ -19,14 +19,14 @@ jobs:
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
+      # 🔹 Install Dependencies
       - name: Install JavaScript Dependencies
         run: |
           rm -rf node_modules package-lock.json  # Ensure a clean install
           npm cache clean --force  # Clear any corrupt cache
           npm install --legacy-peer-deps --force  # Ignore strict peer dependency issues
-          npm install react@17.0.2 react-dom@17.0.2 --save-exact  # Fix react-qr-reader issue
-          npm install styled-components@5.3.11 --save-exact  # Fix react-camera-pro issue
-          npm audit fix --force  # Fix any security vulnerabilities
+          npm prune  # Remove unused packages
+          npm audit fix --force  # Fix vulnerabilities
 
       - name: Install iOS Dependencies
         run: |
