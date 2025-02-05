@@ -7,11 +7,11 @@ on:
       
 jobs:
   build:
-    runs-on: macos-14  # Use a more powerful macOS runner
+    runs-on: macos-14  # Use the latest stable macOS version
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4  # Upgraded to latest version
 
       - name: Set Node.js Memory Limit
         run: echo "NODE_OPTIONS=--max-old-space-size=12288" >> $GITHUB_ENV
@@ -19,24 +19,30 @@ jobs:
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
+      # ✅ Clean and Install Dependencies Safely
       - name: Install JavaScript Dependencies
         run: |
           rm -rf node_modules package-lock.json  # Ensure a clean install
           npm cache clean --force  # Clear any corrupt cache
-          npm install --legacy-peer-deps  # Avoid strict peer dependency issues
-          npm audit fix --force  # Fix any potential vulnerabilities
+          npm install --legacy-peer-deps --force  # Avoid strict peer dependency issues
+          npm audit fix --force  # Fix potential security vulnerabilities
 
-
-
+      # ✅ Install CocoaPods for iOS dependencies
       - name: Install iOS Dependencies
         run: |
           cd ios
-          pod install --repo-update
+          pod repo update  # Update pod repo before install
+          pod install --verbose --no-repo-update  # Use verbose mode for debugging
 
+      # ✅ Ensure Webpack is Installed
       - name: Install Webpack Manually
         run: npm install webpack webpack-dev-server --save-dev
 
-      # 🔹 Import and configure the signing certificate
+      # ✅ Configure Xcode Version (Explicitly)
+      - name: Set Xcode Version
+        run: sudo xcode-select --switch /Applications/Xcode.app/Contents/Developer
+
+      # 🔹 Import and Configure the Signing Certificate
       - name: Import Distribution Certificate
         env:
           DISTRIBUTION_CERTIFICATE: ${{ secrets.DISTRIBUTION_CERTIFICATE }}
@@ -50,7 +56,7 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "" build.keychain
           rm -f signing.p12
 
-      # 🔹 Install provisioning profile
+      # 🔹 Install the Provisioning Profile
       - name: Install Provisioning Profile
         env:
           PROVISIONING_PROFILE: ${{ secrets.PROVISIONING_PROFILE }}
@@ -59,11 +65,13 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
+      # ✅ Build React App First
       - name: Build React App
         env:
           CI: false  # Prevents unnecessary logging that consumes memory
         run: npm run build
 
+      # ✅ Archive iOS App (Xcode Build)
       - name: Build iOS App (Archive Only)
         env:
           APPLE_ID: ${{ secrets.APPLE_ID }}
@@ -82,12 +90,9 @@ jobs:
                      PROVISIONING_PROFILE_SPECIFIER="" \
                      CODE_SIGN_STYLE=Manual
 
-      # 🔹 Upload .xcarchive as an Artifact
+      # 🔹 Upload .xcarchive as an Artifact for Download
       - name: Upload .xcarchive for Download
         uses: actions/upload-artifact@v4
         with:
           name: BlackApp-xcarchive
           path: build/BlackApp.xcarchive
-
-
-
