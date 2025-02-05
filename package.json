@@ -78,7 +78,7 @@
     "eslint-plugin-react": "^7.37.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "styled-components": "^6.1.14",
+    "styled-components": "^5.3.11",
     "webpack": "^4.47.0",
     "webpack-dev-server": "^3.11.3"
   }
