@@ -58,18 +58,40 @@ jobs:
           npm install webpack webpack-dev-server --save-dev
           npm dedupe  # Ensures no duplicate dependencies
 
-      - name: Install React Native Dependencies (If Needed)
+      - name: Ensure React Native Dependencies Exist
         run: |
-          echo "🔹 Ensuring React Native CLI dependencies are installed..."
-          npm install @react-native-community/cli @react-native-community/cli-platform-ios --save-dev
-          echo "✅ React Native dependencies installed."
-
-
-
-      - name: Install iOS Dependencies
+          echo "🔹 Checking if @react-native-community/cli-platform-ios exists..."
+          if [ ! -d "node_modules/@react-native-community/cli-platform-ios" ]; then
+            echo "❌ @react-native-community/cli-platform-ios is missing! Installing now..."
+            npm install @react-native-community/cli @react-native-community/cli-platform-ios --legacy-peer-deps --force
+            echo "✅ Installed React Native CLI dependencies."
+          else
+            echo "✅ @react-native-community/cli-platform-ios is already installed."
+          fi
+          
+      - name: Verify node_modules Before Running Pod Install
         run: |
+          echo "🔹 Checking if node_modules exists..."
+          if [ ! -d "node_modules" ]; then
+            echo "❌ node_modules directory is MISSING! Aborting pod install."
+            exit 1
+          fi
+          echo "✅ node_modules exists. Proceeding with pod install."
+
+ 
+
+      - name: Install iOS Dependencies (Pods)
+        run: |
+          echo "🔹 Navigating to iOS folder..."
           cd ios
+
+          echo "🔹 Removing old Pods..."
+          rm -rf Pods Podfile.lock
+
+          echo "🔹 Installing CocoaPods dependencies..."
           pod install --repo-update
+
+          echo "✅ Pods installed successfully."
 
       # 🔹 Code Signing
       - name: Import Distribution Certificate
