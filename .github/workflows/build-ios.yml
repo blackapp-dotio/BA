@@ -22,11 +22,34 @@ jobs:
       # 🔹 Fix Dependency Issues
       - name: Install JavaScript Dependencies
         run: |
+          echo "🔹 Removing old dependencies..."
           rm -rf node_modules package-lock.json  # Ensure a clean install
+          echo "✅ Removed old dependencies."
+
+          echo "🔹 Cleaning npm cache..."
           npm cache clean --force  # Clear any corrupt cache
+          echo "✅ npm cache cleaned."
+
+          echo "🔹 Installing dependencies..."
           npm install --no-optional --legacy-peer-deps --force
+          echo "✅ Dependencies installed."
+
+          echo "🔹 Checking if node_modules exists..."
+          if [ -d "node_modules" ]; then
+          echo "✅ node_modules directory exists!"
+          else
+          echo "❌ node_modules is MISSING! Installation failed."
+          exit 1
+          fi
+
+          echo "🔹 Running npm prune to remove unused packages..."
           npm prune
+          echo "✅ npm prune completed."
+
+          echo "🔹 Running npm audit fix..."
           npm audit fix --force || true  # Ensures audit fixes don't break the build
+          echo "✅ npm audit fix completed."
+
 
       - name: Remove Deprecated Dependencies
         run: |
