@@ -85,6 +85,14 @@ jobs:
           npm install @react-native-community/cli-platform-ios --legacy-peer-deps --force
           ls -la node_modules/@react-native-community/cli-platform-ios/ || echo "❌ Still Missing!"
     
+      - name: Ensure iOS Project Exists
+        run: |
+          if [ ! -d "ios/BlackApp.xcodeproj" ]; then
+            echo "❌ Missing iOS project! Attempting to regenerate..."
+            npx react-native eject
+          else
+            echo "✅ iOS project exists."
+          fi
 
  
 
