@@ -26,6 +26,7 @@ jobs:
           npm cache clean --force
           npm install --no-optional --legacy-peer-deps --force
           npm prune
+          npm run postinstall  # Ensures native dependencies are set up
           npm audit fix --force || true  # Ensures audit fixes don't break the build
 
       - name: Remove Deprecated Dependencies
