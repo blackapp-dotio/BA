@@ -20,14 +20,13 @@ jobs:
         run: node --expose-gc -e 'gc()'
 
       # 🔹 Fix Dependency Issues
-      - name: Clean & Install JavaScript Dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install --no-optional --legacy-peer-deps --force
-          npm prune
-          npm dedupe
-          npm audit fix --force || true  # Ensures audit fixes don't break the build
+      - name: Install JavaScript Dependencies
+  run: |
+    rm -rf node_modules package-lock.json  # Ensure a clean install
+    npm cache clean --force  # Clear any corrupt cache
+    npm install --no-optional --legacy-peer-deps --force
+    npm prune
+    npm audit fix --force || true  # Ensures audit fixes don't break the build
 
       - name: Remove Deprecated Dependencies
         run: |
@@ -35,6 +34,11 @@ jobs:
           npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
           npm install webpack webpack-dev-server --save-dev
           npm dedupe  # Ensures no duplicate dependencies
+
+      - name: Install React Native Dependencies (If Needed)
+        run: |
+          npm install @react-native-community/cli @react-native-community/cli-platform-ios --save-dev
+
 
       - name: Install iOS Dependencies
         run: |
