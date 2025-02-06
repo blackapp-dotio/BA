@@ -95,14 +95,18 @@ jobs:
           fi
 
  
-
-      - name: Clean and Reinstall CocoaPods
+      - name: Rebuild iOS Project if Corrupted
         run: |
-          cd ios
-          rm -rf Pods Podfile.lock
-          pod deintegrate
-          pod setup
-          pod install --verbose --repo-update
+          if [ ! -d "ios/BlackApp.xcodeproj" ]; then
+            echo "❌ Xcode project missing! Recreating iOS folder..."
+            npx react-native eject
+            cd ios
+            pod install --repo-update
+            cd ..
+          else
+            echo "✅ iOS project exists. Proceeding..."
+          fi
+
 
 
       # 🔹 Code Signing
