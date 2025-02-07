@@ -51,12 +51,11 @@ jobs:
           echo "✅ npm audit fix completed."
 
 
-      - name: Remove Deprecated Dependencies
+      - name: Remove Deprecated & Conflicting Dependencies
         run: |
-          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents
-          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
-          npm install webpack webpack-dev-server --save-dev
-          npm dedupe  # Ensures no duplicate dependencies
+          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents || true
+          npm uninstall react-scripts webpack webpack-dev-server || true
+          npm dedupe  # Remove duplicate dependencies
 
       - name: Ensure React Native Dependencies Exist
         run: |
@@ -140,9 +139,11 @@ jobs:
         run: |
           npm uninstall react-scripts webpack webpack-dev-server || true
 
-      - name: Install Correct Versions of Webpack and React-Scripts
+      - name: Install Required Webpack & Build Dependencies
         run: |
           npm install react-scripts@5.0.1 webpack@5 webpack-dev-server@4 --legacy-peer-deps
+          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
+          npm install crypto-browserify stream-browserify buffer --save-dev
 
       - name: Clean and Reinstall Dependencies
         run: |
@@ -153,30 +154,24 @@ jobs:
           npm update
           npm audit fix --force
 
-      - name: Configure Webpack for Crypto Polyfill
+      - name: Configure Webpack Fallbacks
         run: |
-          echo "module.exports = {" > webpack.config.js
-          echo "  resolve: {" >> webpack.config.js
-          echo "    fallback: {" >> webpack.config.js
-          echo "      'crypto': require.resolve('crypto-browserify')" >> webpack.config.js
-          echo "    }" >> webpack.config.js
-          echo "  }" >> webpack.config.js
-          echo "}" >> webpack.config.js
+          echo "const webpack = require('webpack');" > config-overrides.js
+          echo "module.exports = function override(config) {" >> config-overrides.js
+          echo "  config.resolve.fallback = {" >> config-overrides.js
+          echo "    crypto: require.resolve('crypto-browserify')," >> config-overrides.js
+          echo "    stream: require.resolve('stream-browserify')," >> config-overrides.js
+          echo "    buffer: require.resolve('buffer')" >> config-overrides.js
+          echo "  };" >> config-overrides.js
+          echo "  return config;" >> config-overrides.js
+          echo "};" >> config-overrides.js
 
-      - name: Install Dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm install crypto-browserify stream-browserify buffer --save-dev
 
-      - name: Configure Webpack for Crypto Polyfill
+      - name: Ensure Dependencies Are Installed
         run: |
-          echo "module.exports = {" > webpack.config.js
-          echo "  resolve: {" >> webpack.config.js
-          echo "    fallback: {" >> webpack.config.js
-          echo "      'crypto': require.resolve('crypto-browserify')" >> webpack.config.js
-          echo "    }" >> webpack.config.js
-          echo "  }" >> webpack.config.js
-          echo "}" >> webpack.config.js
+          npm install --no-optional --legacy-peer-deps --force
+          npm prune
+          npm audit fix --force || true
       
       - name: Build React App
         env:
