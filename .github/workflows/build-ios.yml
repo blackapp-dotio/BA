@@ -149,11 +149,9 @@ jobs:
           rm -rf node_modules package-lock.json
           npm cache clean --force
           npm install --legacy-peer-deps
-
-      - name: Install Dependencies
-        run: |
-          npm install --legacy-peer-deps
-          npm install crypto-browserify --save-dev
+          npm install crypto-browserify
+          npm update
+          npm audit fix --force
 
       - name: Configure Webpack for Crypto Polyfill
         run: |
