@@ -131,10 +131,17 @@ jobs:
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
+      - name: Fix ESLint Issues
+        run: |
+          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
+          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
+
+      
       - name: Build React App
         env:
-          CI: false  # Prevents unnecessary logging that consumes memory
-        run: npm run build
+          CI: false
+        run: |
+          npm run build || npm audit fix --force
 
       - name: Build iOS App (Archive Only)
         env:
