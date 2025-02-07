@@ -6,6 +6,17 @@ module.exports = function override(config) {
     config.plugins = [];
   }
 
+  // Add required polyfills for Webpack 5
+  config.resolve = {
+    ...config.resolve,
+    fallback: {
+      ...config.resolve.fallback,
+      crypto: require.resolve("crypto-browserify"),
+      stream: require.resolve("stream-browserify"),
+      buffer: require.resolve("buffer/"),
+    },
+  };
+
   // Add Webpack plugins
   config.plugins.push(
     new webpack.ProvidePlugin({
