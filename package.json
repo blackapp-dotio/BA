@@ -52,6 +52,7 @@
     "test": "cross-env react-app-rewired test"
   },
   "resolutions": {
+    "crypto-browserify": "^3.12.0"
     "webpack": "^5.97.1"
   },
   "eslintConfig": {
