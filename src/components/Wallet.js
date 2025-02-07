@@ -6,7 +6,6 @@ import { ref, onValue, set, push, update, get } from 'firebase/database';
 import { database } from '../firebase';
 import { AuthContext } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import QRCodeComponent from './QRCodeComponent'; // Import the QRCodeComponent
 import './Wallet.css';
 
 const Wallet = () => {
@@ -65,17 +64,6 @@ useEffect(() => {
     });
   }
 }, [user?.uid]);
-
-  // Handle QR code scanning and redirect to the wallet page
-  const handleScan = (recipientId) => {
-    if (recipientId) {
-      setRecipientId(recipientId);
-      navigate(`/wallet/sendMoney/${recipientId}`, { state: { recipientId } });
-      setScannerOpen(false); // Close scanner after scanning
-    } else {
-      setPaymentStatus('Error decoding QR code.');
-    }
-  };
 
   /*********************************************/
   /*          Send Money to Recipient          */
@@ -564,8 +552,7 @@ const validTransactions = transactions.filter(
 
       {paymentStatus && <p>{paymentStatus}</p>}
 
-      {/* QR Code Component */}
-      <QRCodeComponent user={user} handleScan={handleScan} />
+      
 
 
 <div className="pending-transactions">
