@@ -136,6 +136,20 @@ jobs:
           npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
           npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
 
+      - name: Remove Conflicting Dependencies
+        run: |
+          npm uninstall react-scripts webpack webpack-dev-server || true
+
+      - name: Install Correct Versions of Webpack and React-Scripts
+        run: |
+          npm install react-scripts@5.0.1 webpack@5 webpack-dev-server@4 --legacy-peer-deps
+
+      - name: Clean and Reinstall Dependencies
+        run: |
+          rm -rf node_modules package-lock.json
+          npm cache clean --force
+          npm install --legacy-peer-deps
+
       
       - name: Build React App
         env:
