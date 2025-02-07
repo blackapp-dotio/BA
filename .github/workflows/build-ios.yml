@@ -150,12 +150,12 @@ jobs:
           npm cache clean --force
           npm install --legacy-peer-deps
 
-      - name: Install Required Dependencies
+      - name: Install Dependencies
         run: |
           npm install --legacy-peer-deps
           npm install crypto-browserify --save-dev
 
-      - name: Modify Webpack Config for Crypto Polyfill
+      - name: Configure Webpack for Crypto Polyfill
         run: |
           echo "module.exports = {" > webpack.config.js
           echo "  resolve: {" >> webpack.config.js
@@ -165,7 +165,20 @@ jobs:
           echo "  }" >> webpack.config.js
           echo "}" >> webpack.config.js
 
+      - name: Install Dependencies
+        run: |
+          npm install --legacy-peer-deps
+          npm install crypto-browserify --save-dev
 
+      - name: Configure Webpack for Crypto Polyfill
+        run: |
+          echo "module.exports = {" > webpack.config.js
+          echo "  resolve: {" >> webpack.config.js
+          echo "    fallback: {" >> webpack.config.js
+          echo "      'crypto': require.resolve('crypto-browserify')" >> webpack.config.js
+          echo "    }" >> webpack.config.js
+          echo "  }" >> webpack.config.js
+          echo "}" >> webpack.config.js
       
       - name: Build React App
         env:
