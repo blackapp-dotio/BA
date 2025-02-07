@@ -145,14 +145,29 @@ jobs:
           npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
           npm install crypto-browserify stream-browserify buffer --save-dev
 
-      - name: Clean and Reinstall Dependencies
+      - name: Pin Safe Dependency Versions
+        run: |
+          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
+          npm install @firebase/auth@10.4.0 @firebase/auth-compat@0.5.12 @firebase/firestore@4.7.1 @firebase/firestore-compat@0.3.36 @firebase/functions@0.11.7 @firebase/functions-compat@0.3.13 @firebase/storage@0.13.1 @firebase/storage-compat@0.3.11 --legacy-peer-deps
+          npm install webpack-dev-middleware@5.3.4 yargs-parser@20.2.9 --legacy-peer-deps
+
+      - name: Ensure Webpack & React-Scripts Stay Compatible
+        run: |
+          if ! npm list react-scripts | grep 'react-scripts@5.0.1'; then
+            npm install react-scripts@5.0.1 webpack@5 webpack-dev-server@4 --legacy-peer-deps
+          else
+            echo "✅ react-scripts is already installed correctly."
+          fi
+
+
+      - name: Final Dependency Check & Fix
         run: |
           rm -rf node_modules package-lock.json
           npm cache clean --force
-          npm install --legacy-peer-deps
-          npm install crypto-browserify
-          npm update
-          npm audit fix --force
+          npm install --no-optional --legacy-peer-deps --force
+          npm audit fix || true  # Fix vulnerabilities without forcing breaking changes
+          npm audit fix --only=prod || true  # Fix production dependencies only
+
 
       - name: Configure Webpack Fallbacks
         run: |
