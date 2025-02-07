@@ -145,11 +145,23 @@ jobs:
           npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
           npm install crypto-browserify stream-browserify buffer --save-dev
 
-      - name: Pin Safe Dependency Versions
+      - name: Install Secure Firebase Versions
         run: |
           npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
-          npm install @firebase/auth@10.4.0 @firebase/auth-compat@0.5.12 @firebase/firestore@4.7.1 @firebase/firestore-compat@0.3.36 @firebase/functions@0.11.7 @firebase/functions-compat@0.3.13 @firebase/storage@0.13.1 @firebase/storage-compat@0.3.11 --legacy-peer-deps
+          
+          # Install the latest stable Firebase versions
+          npm install @firebase/auth-compat@0.5.18 \
+                      @firebase/firestore@4.7.7 \
+                      @firebase/firestore-compat@0.3.42 \
+                      @firebase/functions@0.12.2 \
+                      @firebase/functions-compat@0.3.19 \
+                      @firebase/storage@0.13.6 \
+                      @firebase/storage-compat@0.3.16 \
+                      --legacy-peer-deps
+
+          # Install Webpack & other dependencies
           npm install webpack-dev-middleware@5.3.4 yargs-parser@20.2.9 --legacy-peer-deps
+
 
       - name: Ensure Webpack & React-Scripts Stay Compatible
         run: |
