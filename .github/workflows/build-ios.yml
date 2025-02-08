@@ -13,8 +13,10 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set Node.js Memory Limit
-        run: echo "NODE_OPTIONS=--max-old-space-size=12288" >> $GITHUB_ENV
+      - name: Optimize Node.js Memory
+        run: |
+          echo "NODE_OPTIONS=--max-old-space-size=16384 --openssl-legacy-provider" >> $GITHUB_ENV
+          node --expose-gc -e 'gc()'
 
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
@@ -232,6 +234,42 @@ jobs:
                       webpack-dev-server@4.15.1 --legacy-peer-deps
 
           echo "✅ Dependencies updated successfully!"
+
+      - name: Fix Dependency Issues
+        run: |
+          echo "🔹 Removing outdated dependencies..."
+          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser postcss nth-check lodash.template shell-quote sockjs terser tough-cookie react-scripts --legacy-peer-deps --force
+
+          echo "🔹 Installing correct versions..."
+          npm install @firebase/auth@1.9.0 \
+                      @firebase/auth-compat@0.5.18 \
+                      @firebase/firestore@4.7.7 \
+                      @firebase/firestore-compat@0.3.42 \
+                      @firebase/functions@0.12.2 \
+                      @firebase/functions-compat@0.3.19 \
+                      @firebase/storage@0.13.6 \
+                      @firebase/storage-compat@0.3.16 \
+                      webpack-dev-middleware@5.3.4 \
+                      yargs-parser@20.2.9 \
+                      serialize-javascript@6.0.1 \
+                      shell-quote@1.8.0 \
+                      sockjs@0.3.21 \
+                      terser@5.30.0 \
+                      tough-cookie@4.1.3 \
+                      lodash.template@4.5.0 \
+                      minimatch@3.0.5 \
+                      postcss@8.4.31 \
+                      nth-check@2.0.1 \
+                      react-scripts@5.0.1 --legacy-peer-deps
+
+          echo "✅ Dependencies updated successfully!"
+
+
+      - name: Fix ESLint Issues
+        run: |
+          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
+          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
+
 
       - name: Ensure React Scripts Compatibility
         run: |
