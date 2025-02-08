@@ -8,11 +8,6 @@ module.exports = override((config) => {
     config.resolve = {};
   }
 
-  // ✅ Remove `fallback` if it exists to avoid Webpack schema errors
-  if (config.resolve.fallback) {
-    delete config.resolve.fallback;
-  }
-
   // ✅ Add alias for cleaner imports
   config.resolve.alias = {
     ...(config.resolve.alias || {}),
