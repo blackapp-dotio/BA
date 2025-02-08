@@ -1,8 +1,8 @@
 const webpack = require("webpack");
 
 module.exports = function override(config) {
-  config.resolve.fallback = {
-    ...config.resolve.fallback,
+  config.resolve.alias = {
+    ...config.resolve.alias,
     crypto: require.resolve("crypto-browserify"),
     stream: require.resolve("stream-browserify"),
     buffer: require.resolve("buffer/")
