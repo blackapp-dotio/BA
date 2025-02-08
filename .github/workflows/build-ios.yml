@@ -227,7 +227,7 @@ jobs:
                 chokidar@3.5.3 \
                 http-proxy-middleware@3.0.3 \
                 ip@1.1.8 \
-                selfsigned@1.10.15 \
+                selfsigned@1.10.14 \
                 webpack@5.88.2 \
                 webpack-dev-server@4.15.1 --legacy-peer-deps
             echo "✅ Dependencies updated successfully!"
