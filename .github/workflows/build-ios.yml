@@ -256,7 +256,7 @@ jobs:
         env:
           CI: false
         run: |
-          npm run build || npm audit fix --force
+          npm run build || npm audit fix
 
       - name: Build iOS App (Archive Only)
         env:
