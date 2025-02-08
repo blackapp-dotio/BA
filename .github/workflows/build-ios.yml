@@ -231,6 +231,9 @@ jobs:
           npm uninstall react-scripts eslint eslint-plugin-flowtype --legacy-peer-deps --force
           npm install react-scripts@5.0.1 eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
       
+      - name: Install customize-cra
+        run: |
+          npm install customize-cra --legacy-peer-deps --force
 
 
       - name: Ensure Dependencies Are Installed
