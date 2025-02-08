@@ -183,19 +183,6 @@ jobs:
           npm audit fix --only=prod || true  # Fix production dependencies only
 
 
-      - name: Configure Webpack Fallbacks
-        run: |
-          echo "const webpack = require('webpack');" > config-overrides.js
-          echo "module.exports = function override(config) {" >> config-overrides.js
-          echo "  config.resolve.fallback = {" >> config-overrides.js
-          echo "    crypto: require.resolve('crypto-browserify')," >> config-overrides.js
-          echo "    stream: require.resolve('stream-browserify')," >> config-overrides.js
-          echo "    buffer: require.resolve('buffer')" >> config-overrides.js
-          echo "  };" >> config-overrides.js
-          echo "  return config;" >> config-overrides.js
-          echo "};" >> config-overrides.js
-
-
       - name: Install Correct Versions
         run: |
           echo "🔹 Installing correct versions..."
