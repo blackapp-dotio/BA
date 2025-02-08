@@ -195,45 +195,6 @@ jobs:
           echo "  return config;" >> config-overrides.js
           echo "};" >> config-overrides.js
 
-      - name: Fix Dependency Issues
-        run: |
-          echo "🔹 Removing outdated dependencies..."
-          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser serialize-javascript shell-quote sockjs terser tough-cookie lodash.template minimatch loader-utils cross-spawn html-minifier postcss dns-packet ansi-html browserslist bonjour chokidar http-proxy-middleware ip selfsigned webpack webpack-dev-server --legacy-peer-deps --force
-
-          echo "🔹 Installing correct versions..."
-          npm install @firebase/auth@1.8.2 \
-                      @firebase/auth-compat@0.5.18 \
-                      @firebase/firestore@4.7.7 \
-                      @firebase/firestore-compat@0.3.42 \
-                      @firebase/functions@0.12.2 \
-                      @firebase/functions-compat@0.3.19 \
-                      @firebase/storage@0.13.6 \
-                      @firebase/storage-compat@0.3.16 \
-                      webpack-dev-middleware@5.3.4 \
-                      yargs-parser@20.2.9 \
-                      serialize-javascript@6.0.1 \
-                      shell-quote@1.8.0 \
-                      sockjs@0.3.21 \
-                      terser@5.30.0 \
-                      tough-cookie@4.1.3 \
-                      lodash.template@4.5.0 \
-                      minimatch@3.0.5 \
-                      loader-utils@2.0.4 \
-                      cross-spawn@6.0.6 \
-                      html-minifier@4.0.0 \
-                      postcss@8.4.31 \
-                      dns-packet@5.2.5 \
-                      ansi-html@0.0.8 \
-                      browserslist@4.21.9 \
-                      bonjour@3.5.0 \
-                      chokidar@3.5.3 \
-                      http-proxy-middleware@2.0.8 \
-                      ip@1.1.8 \
-                      selfsigned@1.10.15 \
-                      webpack@5.88.2 \
-                      webpack-dev-server@4.15.1 --legacy-peer-deps
-
-          echo "✅ Dependencies updated successfully!"
 
       - name: Fix Dependency Issues
         run: |
