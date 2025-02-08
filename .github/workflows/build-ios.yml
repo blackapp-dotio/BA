@@ -162,16 +162,15 @@ jobs:
                       --legacy-peer-deps
 
           # Install Webpack & other dependencies
-          npm install webpack-dev-middleware@5.3.4 yargs-parser@20.2.9 --legacy-peer-deps
+          npm install webpack-dev-middleware@5.65.0 yargs-parser@20.2.9 --legacy-peer-deps
 
 
-      - name: Ensure Webpack & React-Scripts Stay Compatible
+      - name: Fix Webpack Compatibility Issue
         run: |
-          if ! npm list react-scripts | grep 'react-scripts@5.0.1'; then
-            npm install react-scripts@5.0.1 webpack@5 webpack-dev-server@4 --legacy-peer-deps
-          else
-            echo "✅ react-scripts is already installed correctly."
-          fi
+          echo "🔹 Ensuring Webpack version is compatible..."
+          npm uninstall webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
+          npm install webpack@5.65.0 webpack-cli@4.9.1 webpack-dev-server@4.7.4 --legacy-peer-deps
+          echo "✅ Webpack has been fixed!"
 
 
       - name: Final Dependency Check & Fix
