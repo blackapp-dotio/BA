@@ -162,14 +162,14 @@ jobs:
                       --legacy-peer-deps
 
           # Install Webpack & other dependencies
-          npm install webpack-dev-middleware@5.3.4 yargs-parser@20.2.9 --legacy-peer-deps
+          npm install webpack-dev-middleware@4.15.2 yargs-parser@20.2.9 --legacy-peer-deps
 
 
       - name: Fix Webpack Compatibility Issue
         run: |
           echo "🔹 Ensuring Webpack version is compatible..."
           npm uninstall webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
-          npm install webpack@5.65.0 webpack-cli@4.9.1 webpack-dev-server@5.3.4 --legacy-peer-deps
+          npm install webpack@5.65.0 webpack-cli@4.9.1 webpack-dev-server@4.15.2 --legacy-peer-deps
           echo "✅ Webpack has been fixed!"
 
 
