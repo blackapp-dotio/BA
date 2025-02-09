@@ -21,8 +21,7 @@ jobs:
       - name: Force Garbage Collection
         run: node --expose-gc -e 'gc()'
 
-      # 🔹 Fix Dependency Issues
-      - name: Install JavaScript Dependencies
+      - name: Reset Dependencies & Clear Cache
         run: |
           echo "🔹 Removing old dependencies..."
           rm -rf node_modules package-lock.json  # Ensure a clean install
@@ -36,79 +35,58 @@ jobs:
           npm install --no-optional --legacy-peer-deps --force
           echo "✅ Dependencies installed."
 
-          echo "🔹 Checking if node_modules exists..."
-          if [ -d "node_modules" ]; then
-          echo "✅ node_modules directory exists!"
-          else
-          echo "❌ node_modules is MISSING! Installation failed."
-          exit 1
-          fi
-
-          echo "🔹 Running npm prune to remove unused packages..."
-          npm prune
-          echo "✅ npm prune completed."
-
-          echo "🔹 Running npm audit fix..."
-          npm audit fix --force || true  # Ensures audit fixes don't break the build
-          echo "✅ npm audit fix completed."
-
-
       - name: Remove Deprecated & Conflicting Dependencies
         run: |
           npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents || true
           npm uninstall react-scripts webpack webpack-dev-server || true
-          npm dedupe  # Remove duplicate dependencies
+          npm dedupe
 
-      - name: Ensure React Native Dependencies Exist
+      - name: Install Required Webpack & Build Dependencies
         run: |
-          echo "🔹 Checking if @react-native-community/cli-platform-ios exists..."
-          if [ ! -d "node_modules/@react-native-community/cli-platform-ios" ]; then
-            echo "❌ @react-native-community/cli-platform-ios is missing! Installing now..."
-            npm install @react-native-community/cli @react-native-community/cli-platform-ios --legacy-peer-deps --force
-            echo "✅ Installed React Native CLI dependencies."
-          else
-            echo "✅ @react-native-community/cli-platform-ios is already installed."
-          fi
-          
-      - name: Verify node_modules Before Running Pod Install
+          npm uninstall webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
+          npm install react-scripts@5.0.1 \
+                      webpack@5.75.0 \
+                      webpack-cli@4.10.0 \
+                      webpack-dev-server@4.15.1 \
+                      eslint-webpack-plugin \
+                      @babel/eslint-parser \
+                      crypto-browserify \
+                      stream-browserify \
+                      buffer \
+                      --legacy-peer-deps
+
+      - name: Install customize-cra
         run: |
-          echo "🔹 Checking if node_modules exists..."
-          if [ ! -d "node_modules" ]; then
-            echo "❌ node_modules directory is MISSING! Aborting pod install."
-            exit 1
-          fi
-          echo "✅ node_modules exists. Proceeding with pod install."
+          npm install customize-cra --legacy-peer-deps --force
 
-
-      - name: Ensure React Native CLI Platform iOS exists
+      - name: Install Secure Firebase Versions
         run: |
-          echo "🔹 Checking and Installing @react-native-community/cli-platform-ios..."
-          npm install @react-native-community/cli-platform-ios --legacy-peer-deps --force
-          ls -la node_modules/@react-native-community/cli-platform-ios/ || echo "❌ Still Missing!"
-    
-      - name: Ensure iOS Project Exists
+          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
+          npm install @firebase/auth-compat@0.5.18 \
+                      @firebase/firestore@4.7.7 \
+                      @firebase/firestore-compat@0.3.42 \
+                      @firebase/functions@0.12.2 \
+                      @firebase/functions-compat@0.3.19 \
+                      @firebase/storage@0.13.6 \
+                      @firebase/storage-compat@0.3.16 \
+                      --legacy-peer-deps
+
+      - name: Fix ESLint Issues
         run: |
-          if [ ! -d "ios/BlackApp.xcodeproj" ]; then
-            echo "❌ Missing iOS project! Attempting to regenerate..."
-            npx react-native eject
-          else
-            echo "✅ iOS project exists."
-          fi
+          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
+          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
 
- 
-      - name: Rebuild iOS Project if Corrupted
+      - name: Ensure Dependencies Are Installed
         run: |
-          if [ ! -d "ios/BlackApp.xcodeproj" ]; then
-            echo "❌ Xcode project missing! Recreating iOS folder..."
-            npx react-native eject
-            cd ios
-            pod install --repo-update
-            cd ..
-          else
-            echo "✅ iOS project exists. Proceeding..."
-          fi
+          npm install --no-optional --legacy-peer-deps --force
+          npm prune
+          npm audit fix --force || true
 
-
+      - name: Build React App
+        env:
+          CI: false
+        run: |
+          npm run build
 
       # 🔹 Code Signing
       - name: Import Distribution Certificate
@@ -131,114 +109,6 @@ jobs:
           echo "$PROVISIONING_PROFILE" | base64 --decode > BlackApp.mobileprovision
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           mv BlackApp.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
-
-      - name: Fix ESLint Issues
-        run: |
-          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
-          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
-
-      - name: Remove Conflicting Dependencies
-        run: |
-          npm uninstall react-scripts webpack webpack-dev-server || true
-
-      - name: Install Required Webpack & Build Dependencies
-        run: |
-          npm install react-scripts@5.0.1 webpack@5 webpack-dev-server@4 --legacy-peer-deps
-          npm install eslint-webpack-plugin @babel/eslint-parser --save-dev
-          npm install crypto-browserify stream-browserify buffer --save-dev
-
-      - name: Install Secure Firebase Versions
-        run: |
-          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
-          
-          # Install the latest stable Firebase versions
-          npm install @firebase/auth-compat@0.5.18 \
-                      @firebase/firestore@4.7.7 \
-                      @firebase/firestore-compat@0.3.42 \
-                      @firebase/functions@0.12.2 \
-                      @firebase/functions-compat@0.3.19 \
-                      @firebase/storage@0.13.6 \
-                      @firebase/storage-compat@0.3.16 \
-                      --legacy-peer-deps
-
-      - name: Install Required Webpack & Build Dependencies
-        run: |
-          npm uninstall webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
-          npm install webpack@5.75.0 webpack-cli@4.10.0 webpack-dev-server@4.15.1 --legacy-peer-deps
-
-      - name: Final Dependency Check & Fix
-        run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
-          npm install --no-optional --legacy-peer-deps --force
-          npm audit fix || true  # Fix vulnerabilities without forcing breaking changes
-          npm audit fix --only=prod || true  # Fix production dependencies only
-
-
-      - name: Install Correct Versions
-        run: |
-          echo "🔹 Installing correct versions..."
-          npm install @firebase/auth@1.8.2 \
-                @firebase/auth-compat@0.5.18 \
-                @firebase/firestore@4.7.7 \
-                @firebase/firestore-compat@0.3.42 \
-                @firebase/functions@0.12.2 \
-                @firebase/functions-compat@0.3.19 \
-                @firebase/storage@0.13.6 \
-                @firebase/storage-compat@0.3.16 \
-                webpack-dev-middleware@5.3.4 \
-                yargs-parser@20.2.9 \
-                serialize-javascript@6.0.1 \
-                shell-quote@1.8.0 \
-                sockjs@0.3.21 \
-                terser@5.30.0 \
-                tough-cookie@4.1.3 \
-                lodash.template@4.5.0 \
-                minimatch@3.0.5 \
-                loader-utils@2.0.4 \
-                cross-spawn@6.0.6 \
-                html-minifier@4.0.0 \
-                postcss@8.4.31 \
-                dns-packet@5.2.4 \
-                ansi-html@0.0.8 \
-                browserslist@4.21.9 \
-                bonjour@3.5.0 \
-                chokidar@3.5.3 \
-                http-proxy-middleware@3.0.3 \
-                ip@1.1.8 \
-                selfsigned@1.10.14 \
-                webpack@5.88.2 \
-                webpack-dev-server@4.15.1 --legacy-peer-deps
-            echo "✅ Dependencies updated successfully!"
-
-
-      - name: Fix ESLint Issues
-        run: |
-          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
-          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
-
-
-      - name: Ensure React Scripts Compatibility
-        run: |
-          npm uninstall react-scripts eslint eslint-plugin-flowtype --legacy-peer-deps --force
-          npm install react-scripts@5.0.1 eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
-      
-      - name: Install customize-cra
-        run: |
-          npm install customize-cra --legacy-peer-deps --force
-
-
-      - name: Ensure Dependencies Are Installed
-        run: |
-          npm install --no-optional --legacy-peer-deps --force
-          npm prune
-          npm audit fix --force || true
-      
-      - name: Build React App
-        env:
-          CI: false
-        run: |
-          npm run build 
 
       - name: Build iOS App (Archive Only)
         env:
