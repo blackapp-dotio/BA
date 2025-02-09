@@ -163,8 +163,7 @@ jobs:
 
       - name: Install Required Webpack & Build Dependencies
         run: |
-          npm install webpack-dev-server@5.3.4 --legacy-peer-deps
-
+          npm install webpack-dev-server@4.15.1 --legacy-peer-deps
 
 
       - name: Final Dependency Check & Fix
