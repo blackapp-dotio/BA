@@ -128,11 +128,12 @@ jobs:
         run: |
           npm install --no-optional --legacy-peer-deps --force
 
-      - name: Verify Webpack Version
+      - name: Verify Webpack & React-Scripts Versions
         run: |
           echo "✅ Installed Webpack Version: $(npm list webpack)"
+          echo "✅ Installed React-Scripts Version: $(npm list react-scripts)"
 
-      - name: Ensure React Scripts is Installed Properly
+      - name: Ensure React-Scripts is Installed Properly
         run: |
           npm install react-scripts@5.0.1 --legacy-peer-deps --force
 
@@ -143,9 +144,6 @@ jobs:
           npm install --no-optional --legacy-peer-deps --force
           npm audit fix || true  # Fix vulnerabilities without breaking changes
           npm audit fix --only=prod || true  # Fix production dependencies only
-    
-
-
 
       - name: Install customize-cra
         run: |
