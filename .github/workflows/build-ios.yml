@@ -119,39 +119,36 @@ jobs:
           npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
           npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
 
+      - name: Reset and Clean Dependencies
+        run: |
+          echo "🔹 Removing old dependencies..."
+          rm -rf node_modules package-lock.json  # Ensure a clean install
+          npm cache clean --force  # Clear any corrupt cache
+          echo "✅ Cleaned dependencies."
+
+      - name: Install Exact Working Webpack & React-Scripts Versions
+        run: |
+          echo "🔹 Installing correct versions..."
+          npm install react-scripts@3.4.4 \
+                      webpack@4.42.0 \
+                      webpack-dev-server@3.11.0 \
+                      --legacy-peer-deps --force
+          echo "✅ Installed working versions."
+
       - name: Remove Conflicting Dependencies
         run: |
-          npm uninstall react-scripts webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
-          npm dedupe  # Remove duplicate dependencies
+          echo "🔹 Removing Webpack 5 and other conflicts..."
+          npm uninstall webpack-cli eslint-webpack-plugin \
+                        @babel/eslint-parser crypto-browserify \
+                        stream-browserify buffer --legacy-peer-deps --force
+          echo "✅ Removed incompatible dependencies."
 
-      - name: Install Webpack (Downgraded to 5.39.1)
+      - name: Install Project Dependencies
         run: |
-          npm install react-scripts@5.0.1 \
-                      webpack@5.39.1 \
-                      webpack-cli@4.7.2 \
-                      webpack-dev-server@3.11.2 \
-                      eslint-webpack-plugin@2.5.4 \
-                      @babel/eslint-parser \
-                      crypto-browserify \
-                      stream-browserify \
-                      buffer \
-                      --legacy-peer-deps --force
-
-      - name: Verify Installed Webpack & React-Scripts Versions
-        run: |
-          echo "✅ Installed Webpack Version: $(npm list webpack)"
-          echo "✅ Installed Webpack CLI Version: $(npm list webpack-cli)"
-          echo "✅ Installed Webpack Dev Server Version: $(npm list webpack-dev-server)"
-          echo "✅ Installed React-Scripts Version: $(npm list react-scripts)"
-
-      - name: Final Cleanup & Fix
-        run: |
-          rm -rf node_modules package-lock.json
-          npm cache clean --force
           npm install --no-optional --legacy-peer-deps --force
-          npm audit fix || true  # Fix vulnerabilities without breaking changes
-          npm audit fix --only=prod || true  # Fix production dependencies only
-
+          npm prune
+          npm audit fix --force || true
+          echo "✅ Installed dependencies and fixed vulnerabilities."
 
       - name: Install customize-cra
         run: |
