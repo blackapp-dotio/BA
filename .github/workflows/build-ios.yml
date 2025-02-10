@@ -124,21 +124,26 @@ jobs:
           npm uninstall react-scripts webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
           npm dedupe  # Remove duplicate dependencies
 
-      - name: Install a Stable Older Webpack Version
+      - name: Install Dependencies Without Specifying Webpack Version
         run: |
-          npm install webpack@5.64.4 webpack-cli@4.9.1 webpack-dev-server@4.7.4 --legacy-peer-deps --force
+          npm install --no-optional --legacy-peer-deps --force
 
-      - name: Install React Scripts After Webpack
+      - name: Verify Webpack Version
+        run: |
+          echo "✅ Installed Webpack Version: $(npm list webpack)"
+
+      - name: Ensure React Scripts is Installed Properly
         run: |
           npm install react-scripts@5.0.1 --legacy-peer-deps --force
 
-      - name: Clean & Reinstall Dependencies
+      - name: Final Cleanup & Fix
         run: |
           rm -rf node_modules package-lock.json
           npm cache clean --force
           npm install --no-optional --legacy-peer-deps --force
           npm audit fix || true  # Fix vulnerabilities without breaking changes
           npm audit fix --only=prod || true  # Fix production dependencies only
+    
 
 
 
