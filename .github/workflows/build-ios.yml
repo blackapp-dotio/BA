@@ -122,8 +122,8 @@ jobs:
       - name: Reset and Clean Dependencies
         run: |
           echo "🔹 Removing old dependencies..."
-          rm -rf node_modules package-lock.json  # Ensure a clean install
-          npm cache clean --force  # Clear any corrupt cache
+          rm -rf node_modules package-lock.json yarn.lock  # Clean everything
+          npm cache clean --force  # Prevent corrupt cache issues
           echo "✅ Cleaned dependencies."
 
       - name: Install Exact Working Webpack & React-Scripts Versions
@@ -132,12 +132,13 @@ jobs:
           npm install react-scripts@3.4.4 \
                       webpack@4.42.0 \
                       webpack-dev-server@3.11.0 \
+                      react-app-rewired@2.1.6 \
                       --legacy-peer-deps --force
           echo "✅ Installed working versions."
 
       - name: Remove Conflicting Dependencies
         run: |
-          echo "🔹 Removing Webpack 5 and other conflicts..."
+          echo "🔹 Removing Webpack 5 and incompatible packages..."
           npm uninstall webpack-cli eslint-webpack-plugin \
                         @babel/eslint-parser crypto-browserify \
                         stream-browserify buffer --legacy-peer-deps --force
