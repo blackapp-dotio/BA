@@ -145,7 +145,6 @@ jobs:
           npm audit fix --only=prod || true  # Fix production dependencies only
 
 
-
       - name: Install customize-cra
         run: |
           npm install customize-cra --legacy-peer-deps --force
