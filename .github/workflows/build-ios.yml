@@ -13,11 +13,6 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      - name: Set Node.js Version (Match Local)
-        uses: actions/setup-node@v3
-        with:
-          node-version: 14  # Ensure compatibility with Webpack 4 & React Scripts 3.4.4
-
       - name: Optimize Node.js Memory
         run: |
           echo "NODE_OPTIONS=--max-old-space-size=16384 --openssl-legacy-provider" >> $GITHUB_ENV
@@ -29,51 +24,50 @@ jobs:
       - name: Reset Dependencies & Clear Cache
         run: |
           echo "🔹 Removing old dependencies..."
-          rm -rf node_modules package-lock.json yarn.lock
-          npm cache clean --force
-          echo "✅ Cache cleaned."
+          rm -rf node_modules package-lock.json  # Ensure a clean install
+          echo "✅ Removed old dependencies."
 
-      - name: Install Exact Working Webpack & React-Scripts Versions
-        run: |
-          echo "🔹 Installing correct versions..."
-          npm install react-scripts@3.4.4 \
-                      webpack@4.42.0 \
-                      webpack-dev-server@3.11.0 \
-                      react-app-rewired@2.1.6 \
-                      --legacy-peer-deps --force
-          echo "✅ Installed working versions."
+          echo "🔹 Cleaning npm cache..."
+          npm cache clean --force  # Clear any corrupt cache
+          echo "✅ npm cache cleaned."
 
-      - name: Remove Conflicting Dependencies
-        run: |
-          echo "🔹 Removing Webpack 5 and incompatible packages..."
-          npm uninstall webpack-cli eslint-webpack-plugin \
-                        @babel/eslint-parser crypto-browserify \
-                        stream-browserify buffer --legacy-peer-deps --force
-          echo "✅ Removed incompatible dependencies."
-
-      - name: Install Remaining Dependencies
-        run: |
+          echo "🔹 Installing dependencies..."
           npm install --no-optional --legacy-peer-deps --force
-          npm audit fix --force || true
-          echo "✅ Installed additional dependencies."
+          echo "✅ Dependencies installed."
 
-      - name: Verify Installed Webpack Versions
+      - name: Remove Deprecated & Conflicting Dependencies
         run: |
-          npm list webpack webpack-cli webpack-dev-server react-scripts
-          echo "✅ Dependency versions verified."
+          npm uninstall react-camera-pro react-qr-reader eslint-loader html-webpack-plugin babel-eslint svgo rimraf fsevents || true
+          npm uninstall react-scripts webpack webpack-dev-server || true
+          npm dedupe
 
       - name: Ensure React Native Dependencies Exist
         run: |
-          npm install @react-native-community/cli @react-native-community/cli-platform-ios --legacy-peer-deps --force
-
+          echo "🔹 Checking if @react-native-community/cli-platform-ios exists..."
+          if [ ! -d "node_modules/@react-native-community/cli-platform-ios" ]; then
+            echo "❌ @react-native-community/cli-platform-ios is missing! Installing now..."
+            npm install @react-native-community/cli @react-native-community/cli-platform-ios --legacy-peer-deps --force
+            echo "✅ Installed React Native CLI dependencies."
+          else
+            echo "✅ @react-native-community/cli-platform-ios is already installed."
+          fi
+          
       - name: Verify node_modules Before Running Pod Install
         run: |
+          echo "🔹 Checking if node_modules exists..."
           if [ ! -d "node_modules" ]; then
             echo "❌ node_modules directory is MISSING! Aborting pod install."
             exit 1
           fi
           echo "✅ node_modules exists. Proceeding with pod install."
 
+
+      - name: Ensure React Native CLI Platform iOS exists
+        run: |
+          echo "🔹 Checking and Installing @react-native-community/cli-platform-ios..."
+          npm install @react-native-community/cli-platform-ios --legacy-peer-deps --force
+          ls -la node_modules/@react-native-community/cli-platform-ios/ || echo "❌ Still Missing!"
+    
       - name: Ensure iOS Project Exists
         run: |
           if [ ! -d "ios/BlackApp.xcodeproj" ]; then
@@ -82,6 +76,21 @@ jobs:
           else
             echo "✅ iOS project exists."
           fi
+
+ 
+      - name: Rebuild iOS Project if Corrupted
+        run: |
+          if [ ! -d "ios/BlackApp.xcodeproj" ]; then
+            echo "❌ Xcode project missing! Recreating iOS folder..."
+            npx react-native eject
+            cd ios
+            pod install --repo-update
+            cd ..
+          else
+            echo "✅ iOS project exists. Proceeding..."
+          fi
+
+
 
       # 🔹 Code Signing
       - name: Import Distribution Certificate
@@ -110,6 +119,42 @@ jobs:
           npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
           npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
 
+      - name: Reset and Clean Dependencies
+        run: |
+          echo "🔹 Removing old dependencies..."
+          rm -rf node_modules package-lock.json yarn.lock  # Clean everything
+          npm cache clean --force  # Prevent corrupt cache issues
+          echo "✅ Cleaned dependencies."
+
+      - name: Install Exact Working Webpack & React-Scripts Versions
+        run: |
+          echo "🔹 Installing correct versions..."
+          npm install react-scripts@3.4.4 \
+                      webpack@4.42.0 \
+                      webpack-dev-server@3.11.0 \
+                      react-app-rewired@2.1.6 \
+                      --legacy-peer-deps --force
+          echo "✅ Installed working versions."
+
+      - name: Remove Conflicting Dependencies
+        run: |
+          echo "🔹 Removing Webpack 5 and incompatible packages..."
+          npm uninstall webpack-cli eslint-webpack-plugin \
+                        @babel/eslint-parser crypto-browserify \
+                        stream-browserify buffer --legacy-peer-deps --force
+          echo "✅ Removed incompatible dependencies."
+
+      - name: Install Project Dependencies
+        run: |
+          npm install --no-optional --legacy-peer-deps --force
+          npm prune
+          npm audit fix --force || true
+          echo "✅ Installed dependencies and fixed vulnerabilities."
+
+      - name: Install customize-cra
+        run: |
+          npm install customize-cra --legacy-peer-deps --force
+
       - name: Install Secure Firebase Versions
         run: |
           npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
@@ -122,18 +167,23 @@ jobs:
                       @firebase/storage-compat@0.3.16 \
                       --legacy-peer-deps
 
+      - name: Fix ESLint Issues
+        run: |
+          npm uninstall eslint eslint-plugin-flowtype --legacy-peer-deps --force
+          npm install eslint@8.57.0 eslint-plugin-flowtype@8.0.3 --legacy-peer-deps --force
+
       - name: Ensure Dependencies Are Installed
         run: |
           npm install --no-optional --legacy-peer-deps --force
           npm prune
           npm audit fix --force || true
 
+      
       - name: Build React App
         env:
           CI: false
         run: |
           npm run build 
-          echo "✅ React build completed."
 
       - name: Build iOS App (Archive Only)
         env:
@@ -152,10 +202,11 @@ jobs:
                      DEVELOPMENT_TEAM=$TEAM_ID \
                      PROVISIONING_PROFILE_SPECIFIER="" \
                      CODE_SIGN_STYLE=Manual
-          echo "✅ iOS build completed."
 
       - name: Upload .xcarchive as an Artifact
         uses: actions/upload-artifact@v4
         with:
           name: BlackApp-xcarchive
           path: build/BlackApp.xcarchive
+
+
