@@ -122,19 +122,15 @@ jobs:
       - name: Remove Conflicting Dependencies
         run: |
           npm uninstall react-scripts webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
-          npm dedupe  # Ensure no duplicate dependencies
+          npm dedupe  # Remove duplicate dependencies
 
-      - name: Install Webpack Compatible with React-Scripts
+      - name: Install a Stable Older Webpack Version
         run: |
-          npm install webpack@5.44.0 webpack-cli@4.7.2 webpack-dev-server@4.7.4 --legacy-peer-deps --force
+          npm install webpack@5.64.4 webpack-cli@4.9.1 webpack-dev-server@4.7.4 --legacy-peer-deps --force
 
       - name: Install React Scripts After Webpack
         run: |
           npm install react-scripts@5.0.1 --legacy-peer-deps --force
-
-      - name: Install Additional Required Dependencies
-        run: |
-          npm install eslint-webpack-plugin @babel/eslint-parser crypto-browserify stream-browserify buffer --save-dev --legacy-peer-deps
 
       - name: Clean & Reinstall Dependencies
         run: |
@@ -143,6 +139,7 @@ jobs:
           npm install --no-optional --legacy-peer-deps --force
           npm audit fix || true  # Fix vulnerabilities without breaking changes
           npm audit fix --only=prod || true  # Fix production dependencies only
+
 
 
       - name: Install customize-cra
