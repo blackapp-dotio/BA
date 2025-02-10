@@ -126,7 +126,7 @@ jobs:
 
       - name: Install Webpack Compatible with React-Scripts
         run: |
-          npm install webpack@5.64.4 webpack-cli@4.10.0 webpack-dev-server@4.7.4 --legacy-peer-deps --force
+          npm install webpack@5.44.0 webpack-cli@4.7.2 webpack-dev-server@4.7.4 --legacy-peer-deps --force
 
       - name: Install React Scripts After Webpack
         run: |
@@ -143,6 +143,7 @@ jobs:
           npm install --no-optional --legacy-peer-deps --force
           npm audit fix || true  # Fix vulnerabilities without breaking changes
           npm audit fix --only=prod || true  # Fix production dependencies only
+
 
 
       - name: Install customize-cra
