@@ -124,40 +124,26 @@ jobs:
           npm uninstall react-scripts webpack webpack-cli webpack-dev-server --legacy-peer-deps --force
           npm dedupe  # Ensure no duplicate dependencies
 
-      - name: Install Required Webpack & Build Dependencies
+      - name: Install Webpack Compatible with React-Scripts
         run: |
-          npm install react-scripts@5.0.1 \
-                      webpack@5.75.0 \
-                      webpack-cli@4.10.0 \
-                      webpack-dev-server@4.15.1 \
-                      eslint-webpack-plugin \
-                      @babel/eslint-parser \
-                      crypto-browserify \
-                      stream-browserify \
-                      buffer \
-                      --legacy-peer-deps
+          npm install webpack@5.64.4 webpack-cli@4.10.0 webpack-dev-server@4.7.4 --legacy-peer-deps --force
 
-      - name: Install Secure Firebase Versions
+      - name: Install React Scripts After Webpack
         run: |
-          npm uninstall @firebase/auth @firebase/auth-compat @firebase/firestore @firebase/firestore-compat @firebase/functions @firebase/functions-compat @firebase/storage @firebase/storage-compat webpack-dev-middleware yargs-parser --legacy-peer-deps --force
-          
-          # Install the latest stable Firebase versions
-          npm install @firebase/auth-compat@0.5.18 \
-                      @firebase/firestore@4.7.7 \
-                      @firebase/firestore-compat@0.3.42 \
-                      @firebase/functions@0.12.2 \
-                      @firebase/functions-compat@0.3.19 \
-                      @firebase/storage@0.13.6 \
-                      @firebase/storage-compat@0.3.16 \
-                      --legacy-peer-deps
+          npm install react-scripts@5.0.1 --legacy-peer-deps --force
 
-      - name: Final Dependency Check & Fix
+      - name: Install Additional Required Dependencies
+        run: |
+          npm install eslint-webpack-plugin @babel/eslint-parser crypto-browserify stream-browserify buffer --save-dev --legacy-peer-deps
+
+      - name: Clean & Reinstall Dependencies
         run: |
           rm -rf node_modules package-lock.json
           npm cache clean --force
           npm install --no-optional --legacy-peer-deps --force
           npm audit fix || true  # Fix vulnerabilities without breaking changes
           npm audit fix --only=prod || true  # Fix production dependencies only
+
 
       - name: Install customize-cra
         run: |
